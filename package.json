@@ -1,0 +1,87 @@
+{
+  "name": "n8n-nodes-ton",
+  "version": "1.0.0",
+  "description": "A comprehensive n8n community node for TON (The Open Network) blockchain providing 13 resources and 50+ operations for wallets, transactions, Jettons, NFTs, smart contracts, DNS, staking, and DEX operations.",
+  "keywords": [
+    "n8n",
+    "n8n-community-node-package",
+    "ton",
+    "toncoin",
+    "blockchain",
+    "web3",
+    "jetton",
+    "nft",
+    "smart-contract",
+    "defi",
+    "staking",
+    "dex"
+  ],
+  "license": "BUSL-1.1",
+  "homepage": "https://github.com/Velocity-BPA/n8n-nodes-ton",
+  "author": {
+    "name": "Velocity BPA",
+    "email": "licensing@velobpa.com",
+    "url": "https://velobpa.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Velocity-BPA/n8n-nodes-ton.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier --write \"**/*.ts\"",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/TonNetwork.credentials.js",
+      "dist/credentials/TonConnect.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Ton/Ton.node.js",
+      "dist/nodes/Ton/TonTrigger.node.js"
+    ]
+  },
+  "dependencies": {
+    "@orbs-network/ton-access": "^2.3.3",
+    "@ton/core": "^0.56.3",
+    "@ton/crypto": "^3.2.0",
+    "@ton/ton": "^13.11.1",
+    "axios": "^1.6.7",
+    "bignumber.js": "^9.1.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.19",
+    "@typescript-eslint/eslint-plugin": "^7.0.2",
+    "@typescript-eslint/parser": "^7.0.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.1",
+    "gulp": "^4.0.2",
+    "jest": "^29.7.0",
+    "n8n-workflow": "^1.30.0",
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": ">=1.0.0"
+  }
+}
