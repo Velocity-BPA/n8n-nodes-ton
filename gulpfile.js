@@ -1,13 +1,12 @@
-const { src, dest, parallel } = require('gulp');
+/*
+ * Copyright (c) 2026 Velocity BPA, LLC
+ * Licensed under the Business Source License 1.1
+ */
 
-function buildNodeIcons() {
-  return src('nodes/**/*.{png,svg}')
-    .pipe(dest('dist/nodes'));
+const { src, dest } = require('gulp');
+
+function buildIcons() {
+  return src('nodes/**/*.{png,svg}').pipe(dest('dist/nodes'));
 }
 
-function buildCredentialIcons() {
-  return src('credentials/**/*.{png,svg}')
-    .pipe(dest('dist/credentials'));
-}
-
-exports['build:icons'] = parallel(buildNodeIcons, buildCredentialIcons);
+exports['build:icons'] = buildIcons;
