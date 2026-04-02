@@ -3,7 +3,7 @@ import { ICredentialType, INodeProperties } from 'n8n-workflow';
 export class TONApi implements ICredentialType {
 	name = 'tonApi';
 	displayName = 'TON API';
-	documentationUrl = 'https://toncenter.com/api/v3';
+	documentationUrl = 'https://tonapi.io/';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Key',
@@ -11,13 +11,13 @@ export class TONApi implements ICredentialType {
 			type: 'string',
 			typeOptions: { password: true },
 			default: '',
-			description: 'API key for TON Center API. Required for higher rate limits and advanced features.',
+			description: 'Bearer token for TON API authentication. Obtain from TON API portal for higher rate limits and premium features.',
 		},
 		{
 			displayName: 'API Base URL',
 			name: 'baseUrl',
 			type: 'string',
-			default: 'https://toncenter.com/api/v3',
+			default: 'https://tonapi.io/v2',
 			description: 'Base URL for the TON API',
 		},
 	];
