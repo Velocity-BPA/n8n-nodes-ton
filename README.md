@@ -8,24 +8,25 @@
 >
 > For licensing information, visit https://velobpa.com/licensing or contact licensing@velobpa.com.
 
-An n8n community node for integrating with The Open Network (TON) blockchain. This node provides 6 comprehensive resources covering all major TON ecosystem operations including wallet management, jetton transfers, NFT operations, smart contract interactions, DNS resolution, and staking functionality.
+This n8n community node provides comprehensive integration with The Open Network (TON) blockchain, offering 7 core resources for managing accounts, jettons, NFTs, transactions, domains, staking operations, and blockchain data. Build powerful blockchain automation workflows with complete TON ecosystem access.
 
 ![n8n Community Node](https://img.shields.io/badge/n8n-Community%20Node-blue)
 ![License](https://img.shields.io/badge/license-BSL--1.1-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)
 ![TON](https://img.shields.io/badge/TON-Blockchain-0088cc)
-![Web3](https://img.shields.io/badge/Web3-Integration-00d4aa)
+![Crypto](https://img.shields.io/badge/Crypto-API-green)
+![Web3](https://img.shields.io/badge/Web3-Integration-purple)
 
 ## Features
 
-- **Wallet Operations** - Create, import, and manage TON wallets with balance checks and transaction history
-- **Jetton Management** - Transfer, mint, and burn jetton tokens with metadata retrieval
-- **NFT Integration** - Mint, transfer, and query NFT collections and individual items
-- **Smart Contract Interaction** - Deploy, call methods, and execute smart contracts on TON
-- **DNS Resolution** - Resolve TON DNS domains and manage domain records
-- **Staking Operations** - Participate in TON validation with stake management and rewards tracking
-- **Comprehensive Error Handling** - Detailed error messages and retry mechanisms for blockchain operations
-- **Flexible Authentication** - Support for multiple API key configurations and endpoint customization
+- **Account Management** - Query account details, balances, and transaction history across TON network
+- **Jetton Operations** - Manage TON's native token standard with transfer, balance, and metadata operations
+- **NFT Integration** - Complete NFT lifecycle management including minting, transfers, and metadata retrieval
+- **Transaction Processing** - Send, track, and analyze TON blockchain transactions with detailed status monitoring
+- **Domain Services** - Interact with TON DNS for domain registration, resolution, and management
+- **Staking Operations** - Manage validator staking, delegation, and reward distribution workflows
+- **Blockchain Data** - Access real-time blockchain information, block details, and network statistics
+- **Error Handling** - Comprehensive error management with detailed blockchain-specific error codes
 
 ## Installation
 
@@ -60,142 +61,112 @@ n8n start
 
 | Field | Description | Required |
 |-------|-------------|----------|
-| API Key | TON API key for accessing blockchain data | Yes |
-| API Endpoint | Custom API endpoint URL (defaults to TON mainnet) | No |
-| Network | Network selection (mainnet/testnet) | Yes |
-| Private Key | Wallet private key for transaction signing | No |
+| API Key | TON API access key for authenticated requests | Yes |
+| Network | TON network environment (mainnet/testnet) | Yes |
+| Endpoint URL | Custom API endpoint (optional) | No |
 
 ## Resources & Operations
 
-### 1. Wallets
+### 1. Account
 
 | Operation | Description |
 |-----------|-------------|
-| Create Wallet | Generate a new TON wallet with mnemonic phrase |
-| Import Wallet | Import existing wallet using mnemonic or private key |
-| Get Balance | Retrieve TON and jetton balances for a wallet |
-| Get Transactions | Fetch transaction history for a wallet address |
-| Send TON | Transfer TON coins between wallets |
-| Get Wallet Info | Retrieve detailed wallet information and state |
+| Get Account | Retrieve account information and balance |
+| Get Transactions | Fetch account transaction history |
+| Get Methods | Execute account smart contract methods |
+| Send Transaction | Send TON from account |
 
-### 2. Jettons
+### 2. Jetton
 
 | Operation | Description |
 |-----------|-------------|
-| Transfer Jetton | Transfer jetton tokens between wallets |
-| Get Jetton Info | Retrieve jetton metadata and total supply |
-| Get Jetton Balance | Check jetton balance for specific wallet |
-| Mint Jettons | Create new jetton tokens (requires minter rights) |
-| Burn Jettons | Destroy jetton tokens from circulation |
-| Get Jetton Holders | List all holders of a specific jetton |
+| Get Info | Retrieve jetton token information |
+| Get Balance | Check jetton balance for account |
+| Transfer | Send jetton tokens between accounts |
+| Get Holders | List token holders and their balances |
 
-### 3. NFTs
+### 3. NFT
 
 | Operation | Description |
 |-----------|-------------|
-| Mint NFT | Create new NFT item in a collection |
-| Transfer NFT | Transfer NFT ownership between wallets |
-| Get NFT Info | Retrieve NFT metadata and ownership details |
-| Get NFT Collection | Fetch collection information and statistics |
-| Get Owner NFTs | List all NFTs owned by a specific wallet |
-| Update NFT Metadata | Modify NFT metadata (if editable) |
+| Get Collection | Retrieve NFT collection details |
+| Get Item | Fetch specific NFT item information |
+| Transfer | Transfer NFT ownership |
+| Get Items | List all items in collection |
 
-### 4. Smart Contracts
+### 4. Transaction
 
 | Operation | Description |
 |-----------|-------------|
-| Deploy Contract | Deploy smart contract to TON blockchain |
-| Call Get Method | Execute read-only smart contract methods |
-| Send Message | Send message to smart contract |
-| Get Contract State | Retrieve current contract state and data |
-| Get Contract Code | Fetch smart contract source code |
-| Estimate Fees | Calculate transaction fees for contract interactions |
+| Get Transaction | Retrieve transaction by hash |
+| Send | Send new transaction to network |
+| Get Status | Check transaction confirmation status |
+| Trace | Get detailed transaction execution trace |
 
-### 5. DNS
+### 5. Domain
 
 | Operation | Description |
 |-----------|-------------|
-| Resolve Domain | Resolve TON DNS domain to wallet address |
-| Get Domain Info | Retrieve domain registration and expiry details |
-| Register Domain | Register new TON DNS domain |
-| Update Records | Modify DNS records for owned domains |
-| Transfer Domain | Transfer domain ownership |
-| Get Subdomains | List all subdomains of a parent domain |
+| Resolve | Resolve domain to TON address |
+| Get Info | Retrieve domain registration details |
+| Check Availability | Check if domain is available |
+| Get Auctions | List active domain auctions |
 
 ### 6. Staking
 
 | Operation | Description |
 |-----------|-------------|
-| Stake TON | Delegate TON to validator pools |
-| Unstake TON | Withdraw staked TON from validators |
-| Get Stake Info | Retrieve staking balance and rewards |
-| Get Validators | List active validators and their details |
-| Claim Rewards | Withdraw earned staking rewards |
-| Get Pool Info | Fetch staking pool statistics and APY |
+| Get Pools | List available staking pools |
+| Stake | Delegate TON to validator pool |
+| Unstake | Withdraw staked TON |
+| Get Rewards | Retrieve staking reward information |
+
+### 7. Blockchain
+
+| Operation | Description |
+|-----------|-------------|
+| Get Block | Retrieve blockchain block information |
+| Get Config | Fetch network configuration parameters |
+| Get Stats | Get network statistics and metrics |
+| Get Validators | List active network validators |
 
 ## Usage Examples
 
-### Transfer TON Coins
 ```javascript
-// Send 10 TON from one wallet to another
-{
-  "operation": "Send TON",
-  "fromAddress": "EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t",
-  "toAddress": "EQBvW8Z5huBkMJYdnfAEM5JqTNkuWX3diqYENkWsIL0XggGG",
-  "amount": "10.5",
-  "comment": "Payment for services"
-}
-```
+// Check account balance and recent transactions
+const accountInfo = await tonNode.account.getAccount({
+  address: "EQD-cvR0Nz6XAyRBpDeWWNoVt3p8xOiVyJrNMoS2B4WR_9dN"
+});
 
-### Mint NFT
-```javascript
-// Create a new NFT in collection
-{
-  "operation": "Mint NFT",
-  "collectionAddress": "EQAOQdwdw8kGftJCSFgOErM1mBjYPe4DBPq8-AhF6vr9si5N",
-  "itemIndex": "1",
-  "ownerAddress": "EQBvW8Z5huBkMJYdnfAEM5JqTNkuWX3diqYENkWsIL0XggGG",
-  "metadata": {
-    "name": "Awesome NFT #1",
-    "description": "First NFT in our collection",
-    "image": "https://example.com/nft1.jpg"
-  }
-}
-```
+// Transfer jetton tokens
+const jettonTransfer = await tonNode.jetton.transfer({
+  from: "EQD-cvR0Nz6XAyRBpDeWWNoVt3p8xOiVyJrNMoS2B4WR_9dN",
+  to: "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c",
+  amount: "1000000000",
+  jettonAddress: "EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA"
+});
 
-### Transfer Jettons
-```javascript
-// Transfer 1000 USDT jettons
-{
-  "operation": "Transfer Jetton",
-  "jettonMaster": "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs",
-  "fromAddress": "EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t",
-  "toAddress": "EQBvW8Z5huBkMJYdnfAEM5JqTNkuWX3diqYENkWsIL0XggGG",
-  "amount": "1000.00"
-}
-```
+// Get NFT collection details
+const nftCollection = await tonNode.nft.getCollection({
+  address: "EQD-cvR0Nz6XAyRBpDeWWNoVt3p8xOiVyJrNMoS2B4WR_9dN"
+});
 
-### Stake TON
-```javascript
-// Stake 100 TON with validator
-{
-  "operation": "Stake TON",
-  "validatorAddress": "Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF",
-  "amount": "100.0",
-  "poolAddress": "EQDrLq-X6qzWX-h0sFxr_8Rw7e9b9v0J2W_gE_JgL5T1r9r1"
-}
+// Resolve TON domain to address
+const domainInfo = await tonNode.domain.resolve({
+  domain: "alice.ton"
+});
 ```
 
 ## Error Handling
 
 | Error | Description | Solution |
 |-------|-------------|----------|
-| Invalid Address | Wallet address format is incorrect | Verify address format and checksum |
-| Insufficient Balance | Not enough TON for transaction | Check wallet balance and reduce amount |
-| Network Timeout | API request timed out | Retry operation or check network connection |
-| Invalid Private Key | Private key format or permissions invalid | Verify key format and wallet access |
+| Invalid Address | Provided TON address format is incorrect | Verify address format and checksum |
+| Insufficient Balance | Account doesn't have enough TON for operation | Check account balance before transaction |
+| Network Timeout | TON network request timed out | Retry request or check network status |
+| Invalid API Key | Authentication failed with provided credentials | Verify API key and permissions |
 | Contract Error | Smart contract execution failed | Check contract state and method parameters |
-| Rate Limited | API rate limit exceeded | Implement delays between requests |
+| Rate Limit | API request rate limit exceeded | Implement request throttling and backoff |
 
 ## Development
 
@@ -240,5 +211,5 @@ Contributions are welcome! Please ensure:
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/Velocity-BPA/n8n-nodes-ton/issues)
-- **TON Documentation**: [docs.ton.org](https://docs.ton.org)
-- **TON Community**: [t.me/toncoin](https://t.me/toncoin)
+- **TON Documentation**: [TON Developer Portal](https://docs.ton.org/)
+- **Community**: [TON Discord](https://discord.gg/ton)
