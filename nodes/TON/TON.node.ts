@@ -49,6 +49,34 @@ export class TON implements INodeType {
         noDataExpression: true,
         options: [
           {
+            name: 'Account',
+            value: 'account',
+          },
+          {
+            name: 'Jetton',
+            value: 'jetton',
+          },
+          {
+            name: 'NFT',
+            value: 'nFT',
+          },
+          {
+            name: 'Transaction',
+            value: 'transaction',
+          },
+          {
+            name: 'Domain',
+            value: 'domain',
+          },
+          {
+            name: 'Staking',
+            value: 'staking',
+          },
+          {
+            name: 'Blockchain',
+            value: 'blockchain',
+          },
+          {
             name: 'Wallets',
             value: 'wallets',
           },
@@ -67,15 +95,259 @@ export class TON implements INodeType {
           {
             name: 'DNS',
             value: 'dNS',
-          },
-          {
-            name: 'Staking',
-            value: 'staking',
           }
         ],
-        default: 'wallets',
+        default: 'account',
       },
       // Operation dropdowns per resource
+{
+	displayName: 'Operation',
+	name: 'operation',
+	type: 'options',
+	noDataExpression: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+		},
+	},
+	options: [
+		{
+			name: 'Get Account',
+			value: 'getAccount',
+			description: 'Get account info by address',
+			action: 'Get account info',
+		},
+		{
+			name: 'Run Get Method',
+			value: 'runGetMethod',
+			description: 'Execute get method for account',
+			action: 'Run get method for account',
+		},
+		{
+			name: 'Get Account Jettons',
+			value: 'getAccountJettons',
+			description: "Get account's jetton balances",
+			action: 'Get account jetton balances',
+		},
+		{
+			name: 'Get Account Events',
+			value: 'getAccountEvents',
+			description: 'Get account transaction events',
+			action: 'Get account transaction events',
+		},
+		{
+			name: 'Get Bulk Accounts',
+			value: 'getBulkAccounts',
+			description: 'Get multiple accounts info',
+			action: 'Get multiple accounts info',
+		},
+		{
+			name: 'Get Account Diff',
+			value: 'getAccountDiff',
+			description: 'Get account state changes',
+			action: 'Get account state changes',
+		},
+	],
+	default: 'getAccount',
+},
+{
+	displayName: 'Operation',
+	name: 'operation',
+	type: 'options',
+	noDataExpression: true,
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+		},
+	},
+	options: [
+		{
+			name: 'Get Jetton',
+			value: 'getJetton',
+			description: 'Get jetton metadata and info',
+			action: 'Get jetton metadata and info',
+		},
+		{
+			name: 'Get Jettons',
+			value: 'getJettons',
+			description: 'Get list of jettons',
+			action: 'Get list of jettons',
+		},
+		{
+			name: 'Get Jetton Holders',
+			value: 'getJettonHolders',
+			description: 'Get jetton holders list',
+			action: 'Get jetton holders list',
+		},
+		{
+			name: 'Get Bulk Jettons',
+			value: 'getBulkJettons',
+			description: 'Get multiple jettons info',
+			action: 'Get multiple jettons info',
+		},
+		{
+			name: 'Get Jetton Transfers',
+			value: 'getJettonTransfers',
+			description: 'Get jetton transfer history',
+			action: 'Get jetton transfer history',
+		},
+	],
+	default: 'getJetton',
+},
+{
+  displayName: 'Operation',
+  name: 'operation',
+  type: 'options',
+  noDataExpression: true,
+  displayOptions: { show: { resource: ['nFT'] } },
+  options: [
+    {
+      name: 'Get NFT Collections',
+      value: 'getNFTCollections',
+      description: 'Get NFT collections list',
+      action: 'Get NFT collections',
+    },
+    {
+      name: 'Get NFT Collection',
+      value: 'getNFTCollection',
+      description: 'Get NFT collection info',
+      action: 'Get NFT collection',
+    },
+    {
+      name: 'Get Collection Items',
+      value: 'getCollectionItems',
+      description: 'Get NFT items in collection',
+      action: 'Get collection items',
+    },
+    {
+      name: 'Get NFT',
+      value: 'getNFT',
+      description: 'Get individual NFT info',
+      action: 'Get NFT',
+    },
+    {
+      name: 'Get NFT History',
+      value: 'getNFTHistory',
+      description: 'Get NFT transfer history',
+      action: 'Get NFT history',
+    },
+    {
+      name: 'Get Bulk NFTs',
+      value: 'getBulkNFTs',
+      description: 'Get multiple NFTs info',
+      action: 'Get bulk NFTs',
+    },
+  ],
+  default: 'getNFTCollections',
+},
+{
+  displayName: 'Operation',
+  name: 'operation',
+  type: 'options',
+  noDataExpression: true,
+  displayOptions: { show: { resource: ['transaction'] } },
+  options: [
+    { name: 'Get Transaction', value: 'getTransaction', description: 'Get transaction by hash', action: 'Get transaction by hash' },
+    { name: 'Get Bulk Transactions', value: 'getBulkTransactions', description: 'Get multiple transactions', action: 'Get multiple transactions' },
+    { name: 'Get Transactions', value: 'getTransactions', description: 'Get transactions list', action: 'Get transactions list' },
+    { name: 'Get Transaction Trace', value: 'getTransactionTrace', description: 'Get transaction execution trace', action: 'Get transaction execution trace' },
+    { name: 'Emulate Transaction', value: 'emulateTransaction', description: 'Emulate transaction execution', action: 'Emulate transaction execution' }
+  ],
+  default: 'getTransaction',
+},
+{
+  displayName: 'Operation',
+  name: 'operation',
+  type: 'options',
+  noDataExpression: true,
+  displayOptions: { show: { resource: ['domain'] } },
+  options: [
+    { name: 'Resolve Domain', value: 'resolveDomain', description: 'Resolve domain to address', action: 'Resolve domain to address' },
+    { name: 'Get Domain Bids', value: 'getDomainBids', description: 'Get domain auction bids', action: 'Get domain auction bids' },
+    { name: 'Get Domains Auctions', value: 'getDomainsAuctions', description: 'Get active domain auctions', action: 'Get active domain auctions' },
+    { name: 'Get Domain Info', value: 'getDomainInfo', description: 'Get domain registration info', action: 'Get domain registration info' },
+    { name: 'Bulk Resolve Domains', value: 'bulkResolveDomains', description: 'Resolve multiple domains', action: 'Resolve multiple domains' }
+  ],
+  default: 'resolveDomain',
+},
+{
+	displayName: 'Operation',
+	name: 'operation',
+	type: 'options',
+	noDataExpression: true,
+	displayOptions: {
+		show: {
+			resource: ['staking'],
+		},
+	},
+	options: [
+		{
+			name: 'Get Staking Pools',
+			value: 'getStakingPools',
+			description: 'Get list of staking pools',
+			action: 'Get staking pools',
+		},
+		{
+			name: 'Get Staking Pool',
+			value: 'getStakingPool',
+			description: 'Get staking pool info',
+			action: 'Get staking pool',
+		},
+		{
+			name: 'Get Pool History',
+			value: 'getPoolHistory',
+			description: 'Get pool staking history',
+			action: 'Get pool history',
+		},
+		{
+			name: 'Get Account Staking',
+			value: 'getAccountStaking',
+			description: 'Get account staking info',
+			action: 'Get account staking',
+		},
+		{
+			name: 'Get Validators',
+			value: 'getValidators',
+			description: 'Get list of active validators',
+			action: 'Get validators',
+		},
+		{
+			name: 'Get Nominators',
+			value: 'getNominators',
+			description: 'Get nominator pool information',
+			action: 'Get nominators',
+		},
+		{
+			name: 'Get Stakes',
+			value: 'getStakes',
+			description: 'Get staking information for address',
+			action: 'Get stakes',
+		},
+		{
+			name: 'Delegate Stake',
+			value: 'delegateStake',
+			description: 'Delegate stake to validator',
+			action: 'Delegate stake',
+		},
+	],
+	default: 'getStakingPools',
+},
+{
+  displayName: 'Operation',
+  name: 'operation',
+  type: 'options',
+  noDataExpression: true,
+  displayOptions: { show: { resource: ['blockchain'] } },
+  options: [
+    { name: 'Get Masterchain Info', value: 'getMasterchainInfo', description: 'Get masterchain head block info', action: 'Get masterchain info' },
+    { name: 'Get Blockchain Block', value: 'getBlockchainBlock', description: 'Get block information', action: 'Get blockchain block' },
+    { name: 'Get Block Transactions', value: 'getBlockTransactions', description: 'Get block transactions', action: 'Get block transactions' },
+    { name: 'Get Validators', value: 'getValidators', description: 'Get current validators set', action: 'Get validators' },
+    { name: 'Get Blockchain Config', value: 'getBlockchainConfig', description: 'Get blockchain configuration', action: 'Get blockchain config' },
+    { name: 'Get Status', value: 'getStatus', description: 'Get blockchain status and info', action: 'Get status' }
+  ],
+  default: 'getMasterchainInfo',
+},
 {
   displayName: 'Operation',
   name: 'operation',
@@ -296,51 +568,837 @@ export class TON implements INodeType {
   ],
   default: 'resolveDns',
 },
+      // Parameter definitions
 {
-  displayName: 'Operation',
-  name: 'operation',
-  type: 'options',
-  noDataExpression: true,
+	displayName: 'Account ID',
+	name: 'accountId',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccount'],
+		},
+	},
+	default: '',
+	placeholder: 'EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF',
+	description: 'Account identifier (address)',
+},
+{
+	displayName: 'Account ID',
+	name: 'accountId',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['runGetMethod'],
+		},
+	},
+	default: '',
+	placeholder: 'EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF',
+	description: 'Account identifier (address)',
+},
+{
+	displayName: 'Method Name',
+	name: 'methodName',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['runGetMethod'],
+		},
+	},
+	default: '',
+	placeholder: 'get_balance',
+	description: 'Method name to execute',
+},
+{
+	displayName: 'Arguments',
+	name: 'args',
+	type: 'string',
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['runGetMethod'],
+		},
+	},
+	default: '',
+	placeholder: '["arg1", "arg2"]',
+	description: 'JSON array of method arguments',
+},
+{
+	displayName: 'Account ID',
+	name: 'accountId',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountJettons'],
+		},
+	},
+	default: '',
+	placeholder: 'EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF',
+	description: 'Account identifier (address)',
+},
+{
+	displayName: 'Currencies',
+	name: 'currencies',
+	type: 'string',
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountJettons'],
+		},
+	},
+	default: '',
+	placeholder: 'ton,usdt',
+	description: 'Comma-separated list of currencies to filter by',
+},
+{
+	displayName: 'Account ID',
+	name: 'accountId',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountEvents'],
+		},
+	},
+	default: '',
+	placeholder: 'EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF',
+	description: 'Account identifier (address)',
+},
+{
+	displayName: 'Limit',
+	name: 'limit',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountEvents'],
+		},
+	},
+	default: 100,
+	description: 'Maximum number of events to return',
+},
+{
+	displayName: 'Start Date',
+	name: 'startDate',
+	type: 'dateTime',
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountEvents'],
+		},
+	},
+	default: '',
+	description: 'Start date for events filter',
+},
+{
+	displayName: 'End Date',
+	name: 'endDate',
+	type: 'dateTime',
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountEvents'],
+		},
+	},
+	default: '',
+	description: 'End date for events filter',
+},
+{
+	displayName: 'Account IDs',
+	name: 'accountIds',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getBulkAccounts'],
+		},
+	},
+	default: '',
+	placeholder: 'EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF,EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c',
+	description: 'Comma-separated list of account addresses',
+},
+{
+	displayName: 'Account ID',
+	name: 'accountId',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountDiff'],
+		},
+	},
+	default: '',
+	placeholder: 'EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF',
+	description: 'Account identifier (address)',
+},
+{
+	displayName: 'Start Date',
+	name: 'startDate',
+	type: 'dateTime',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountDiff'],
+		},
+	},
+	default: '',
+	description: 'Start date for diff comparison',
+},
+{
+	displayName: 'End Date',
+	name: 'endDate',
+	type: 'dateTime',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountDiff'],
+		},
+	},
+	default: '',
+	description: 'End date for diff comparison',
+},
+{
+	displayName: 'Jetton ID',
+	name: 'jettonId',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJetton'],
+		},
+	},
+	default: '',
+	description: 'The jetton identifier',
+},
+{
+	displayName: 'Limit',
+	name: 'limit',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJettons'],
+		},
+	},
+	default: 100,
+	description: 'Maximum number of jettons to return',
+},
+{
+	displayName: 'Offset',
+	name: 'offset',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJettons'],
+		},
+	},
+	default: 0,
+	description: 'Number of jettons to skip',
+},
+{
+	displayName: 'Jetton ID',
+	name: 'jettonId',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJettonHolders'],
+		},
+	},
+	default: '',
+	description: 'The jetton identifier',
+},
+{
+	displayName: 'Limit',
+	name: 'limit',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJettonHolders'],
+		},
+	},
+	default: 100,
+	description: 'Maximum number of holders to return',
+},
+{
+	displayName: 'Offset',
+	name: 'offset',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJettonHolders'],
+		},
+	},
+	default: 0,
+	description: 'Number of holders to skip',
+},
+{
+	displayName: 'Jetton IDs',
+	name: 'jettonIds',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getBulkJettons'],
+		},
+	},
+	default: '',
+	description: 'Comma-separated list of jetton identifiers',
+},
+{
+	displayName: 'Jetton ID',
+	name: 'jettonId',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJettonTransfers'],
+		},
+	},
+	default: '',
+	description: 'The jetton identifier',
+},
+{
+	displayName: 'Limit',
+	name: 'limit',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJettonTransfers'],
+		},
+	},
+	default: 100,
+	description: 'Maximum number of transfers to return',
+},
+{
+	displayName: 'Offset',
+	name: 'offset',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJettonTransfers'],
+		},
+	},
+	default: 0,
+	description: 'Number of transfers to skip',
+},
+{
+	displayName: 'Start Date',
+	name: 'startDate',
+	type: 'dateTime',
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJettonTransfers'],
+		},
+	},
+	default: '',
+	description: 'Filter transfers from this date',
+},
+{
+	displayName: 'End Date',
+	name: 'endDate',
+	type: 'dateTime',
+	displayOptions: {
+		show: {
+			resource: ['jetton'],
+			operation: ['getJettonTransfers'],
+		},
+	},
+	default: '',
+	description: 'Filter transfers until this date',
+},
+{
+  displayName: 'Limit',
+  name: 'limit',
+  type: 'number',
+  displayOptions: {
+    show: {
+      resource: ['nFT'],
+      operation: ['getNFTCollections'],
+    },
+  },
+  default: 50,
+  description: 'Maximum number of collections to return',
+},
+{
+  displayName: 'Offset',
+  name: 'offset',
+  type: 'number',
+  displayOptions: {
+    show: {
+      resource: ['nFT'],
+      operation: ['getNFTCollections'],
+    },
+  },
+  default: 0,
+  description: 'Number of collections to skip',
+},
+{
+  displayName: 'Collection Address',
+  name: 'collectionAddress',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['nFT'],
+      operation: ['getNFTCollection', 'getCollectionItems'],
+    },
+  },
+  default: '',
+  description: 'The address of the NFT collection',
+},
+{
+  displayName: 'Limit',
+  name: 'limit',
+  type: 'number',
+  displayOptions: {
+    show: {
+      resource: ['nFT'],
+      operation: ['getCollectionItems'],
+    },
+  },
+  default: 50,
+  description: 'Maximum number of items to return',
+},
+{
+  displayName: 'Offset',
+  name: 'offset',
+  type: 'number',
+  displayOptions: {
+    show: {
+      resource: ['nFT'],
+      operation: ['getCollectionItems'],
+    },
+  },
+  default: 0,
+  description: 'Number of items to skip',
+},
+{
+  displayName: 'NFT Address',
+  name: 'nftAddress',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['nFT'],
+      operation: ['getNFT', 'getNFTHistory'],
+    },
+  },
+  default: '',
+  description: 'The address of the NFT',
+},
+{
+  displayName: 'Limit',
+  name: 'limit',
+  type: 'number',
+  displayOptions: {
+    show: {
+      resource: ['nFT'],
+      operation: ['getNFTHistory'],
+    },
+  },
+  default: 50,
+  description: 'Maximum number of history records to return',
+},
+{
+  displayName: 'Start Date',
+  name: 'startDate',
+  type: 'dateTime',
+  displayOptions: {
+    show: {
+      resource: ['nFT'],
+      operation: ['getNFTHistory'],
+    },
+  },
+  default: '',
+  description: 'Start date for history query (Unix timestamp)',
+},
+{
+  displayName: 'End Date',
+  name: 'endDate',
+  type: 'dateTime',
+  displayOptions: {
+    show: {
+      resource: ['nFT'],
+      operation: ['getNFTHistory'],
+    },
+  },
+  default: '',
+  description: 'End date for history query (Unix timestamp)',
+},
+{
+  displayName: 'NFT Addresses',
+  name: 'nftAddresses',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['nFT'],
+      operation: ['getBulkNFTs'],
+    },
+  },
+  default: '',
+  description: 'Comma-separated list of NFT addresses',
+},
+{
+  displayName: 'Transaction ID',
+  name: 'transactionId',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['transaction'],
+      operation: ['getTransaction']
+    }
+  },
+  default: '',
+  description: 'Transaction hash to retrieve'
+},
+{
+  displayName: 'Transaction IDs',
+  name: 'transactionIds',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['transaction'],
+      operation: ['getBulkTransactions']
+    }
+  },
+  default: '',
+  description: 'Comma-separated list of transaction IDs'
+},
+{
+  displayName: 'Workchain',
+  name: 'workchain',
+  type: 'number',
+  required: false,
+  displayOptions: {
+    show: {
+      resource: ['transaction'],
+      operation: ['getTransactions']
+    }
+  },
+  default: 0,
+  description: 'Workchain ID'
+},
+{
+  displayName: 'Shard',
+  name: 'shard',
+  type: 'string',
+  required: false,
+  displayOptions: {
+    show: {
+      resource: ['transaction'],
+      operation: ['getTransactions']
+    }
+  },
+  default: '',
+  description: 'Shard ID in hex format'
+},
+{
+  displayName: 'Sequence Number',
+  name: 'seqno',
+  type: 'number',
+  required: false,
+  displayOptions: {
+    show: {
+      resource: ['transaction'],
+      operation: ['getTransactions']
+    }
+  },
+  default: 0,
+  description: 'Sequence number'
+},
+{
+  displayName: 'Limit',
+  name: 'limit',
+  type: 'number',
+  required: false,
+  displayOptions: {
+    show: {
+      resource: ['transaction'],
+      operation: ['getTransactions']
+    }
+  },
+  default: 100,
+  description: 'Maximum number of transactions to return'
+},
+{
+  displayName: 'Transaction ID',
+  name: 'transactionId',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['transaction'],
+      operation: ['getTransactionTrace']
+    }
+  },
+  default: '',
+  description: 'Transaction hash to get execution trace for'
+},
+{
+  displayName: 'BOC',
+  name: 'boc',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['transaction'],
+      operation: ['emulateTransaction']
+    }
+  },
+  default: '',
+  description: 'Bag of Cells (BOC) data for transaction emulation'
+},
+{
+  displayName: 'Domain Name',
+  name: 'domainName',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['domain'], operation: ['resolveDomain'] } },
+  default: '',
+  description: 'The domain name to resolve'
+},
+{
+  displayName: 'Domain Name',
+  name: 'domainName',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['domain'], operation: ['getDomainBids'] } },
+  default: '',
+  description: 'The domain name to get auction bids for'
+},
+{
+  displayName: 'TLD',
+  name: 'tld',
+  type: 'string',
+  required: false,
+  displayOptions: { show: { resource: ['domain'], operation: ['getDomainsAuctions'] } },
+  default: '',
+  description: 'Top-level domain to filter auctions'
+},
+{
+  displayName: 'Domain Name',
+  name: 'domainName',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['domain'], operation: ['getDomainInfo'] } },
+  default: '',
+  description: 'The domain name to get registration info for'
+},
+{
+  displayName: 'Domains',
+  name: 'domains',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['domain'], operation: ['bulkResolveDomains'] } },
+  default: '',
+  description: 'Comma-separated list of domains to resolve',
+  typeOptions: {
+    alwaysOpenEditWindow: true,
+    rows: 3,
+  },
+},
+{
+	displayName: 'Available For',
+	name: 'available_for',
+	type: 'string',
+	displayOptions: {
+		show: {
+			resource: ['staking'],
+			operation: ['getStakingPools'],
+		},
+	},
+	default: '',
+	description: 'Filter pools available for specific criteria',
+},
+{
+	displayName: 'Include Unverified',
+	name: 'include_unverified',
+	type: 'boolean',
+	displayOptions: {
+		show: {
+			resource: ['staking'],
+			operation: ['getStakingPools'],
+		},
+	},
+	default: false,
+	description: 'Whether to include unverified pools',
+},
+{
+	displayName: 'Pool ID',
+	name: 'pool_id',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['staking'],
+			operation: ['getStakingPool', 'getPoolHistory'],
+		},
+	},
+	default: '',
+	description: 'The staking pool ID',
+},
+{
+	displayName: 'Limit',
+	name: 'limit',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['staking'],
+			operation: ['getPoolHistory'],
+		},
+	},
+	default: 100,
+	description: 'Maximum number of records to return',
+},
+{
+	displayName: 'Offset',
+	name: 'offset',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['staking'],
+			operation: ['getPoolHistory'],
+		},
+	},
+	default: 0,
+	description: 'Number of records to skip',
+},
+{
+	displayName: 'Account ID',
+	name: 'account_id',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['staking'],
+			operation: ['getAccountStaking'],
+		},
+	},
+	default: '',
+	description: 'The account ID to get staking info for',
+},
+{
+  displayName: 'Limit',
+  name: 'limit',
+  type: 'number',
   displayOptions: {
     show: {
       resource: ['staking'],
+      operation: ['getValidators', 'getNominators'],
     },
   },
-  options: [
-    {
-      name: 'Get Validators',
-      value: 'getValidators',
-      description: 'Get list of active validators',
-      action: 'Get validators',
-    },
-    {
-      name: 'Get Nominators',
-      value: 'getNominators',
-      description: 'Get nominator pool information',
-      action: 'Get nominators',
-    },
-    {
-      name: 'Get Stakes',
-      value: 'getStakes',
-      description: 'Get staking information for address',
-      action: 'Get stakes',
-    },
-    {
-      name: 'Get Staking Pools',
-      value: 'getStakingPools',
-      description: 'Get available staking pools',
-      action: 'Get staking pools',
-    },
-    {
-      name: 'Delegate Stake',
-      value: 'delegateStake',
-      description: 'Delegate stake to validator',
-      action: 'Delegate stake',
-    },
-  ],
-  default: 'getValidators',
+  default: 50,
+  description: 'Maximum number of items to return',
 },
-      // Parameter definitions
+{
+  displayName: 'Offset',
+  name: 'offset',
+  type: 'number',
+  displayOptions: {
+    show: {
+      resource: ['staking'],
+      operation: ['getValidators', 'getNominators'],
+    },
+  },
+  default: 0,
+  description: 'Number of items to skip',
+},
+{
+  displayName: 'Nominator Address',
+  name: 'nominatorAddress',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['staking'],
+      operation: ['getStakes'],
+    },
+  },
+  default: '',
+  description: 'The nominator address to get staking information for',
+},
+{
+  displayName: 'Validator Address',
+  name: 'validatorAddress',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['staking'],
+      operation: ['delegateStake'],
+    },
+  },
+  default: '',
+  description: 'The validator address to delegate stake to',
+},
+{
+  displayName: 'Amount',
+  name: 'amount',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['staking'],
+      operation: ['delegateStake'],
+    },
+  },
+  default: '',
+  description: 'The amount to stake (in nanoTON)',
+},
+{
+  displayName: 'Nominator Address',
+  name: 'nominatorAddress',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['staking'],
+      operation: ['delegateStake'],
+    },
+  },
+  default: '',
+  description: 'The nominator address making the delegation',
+},
+{
+  displayName: 'Block ID',
+  name: 'blockId',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['blockchain'],
+      operation: ['getBlockchainBlock', 'getBlockTransactions']
+    }
+  },
+  default: '',
+  description: 'The block ID to retrieve information for',
+},
 {
   displayName: 'Address',
   name: 'address',
@@ -982,88 +2040,6 @@ export class TON implements INodeType {
   default: '',
   description: 'The address of the bidder',
 },
-{
-  displayName: 'Limit',
-  name: 'limit',
-  type: 'number',
-  displayOptions: {
-    show: {
-      resource: ['staking'],
-      operation: ['getValidators', 'getNominators', 'getStakingPools'],
-    },
-  },
-  default: 50,
-  description: 'Maximum number of items to return',
-},
-{
-  displayName: 'Offset',
-  name: 'offset',
-  type: 'number',
-  displayOptions: {
-    show: {
-      resource: ['staking'],
-      operation: ['getValidators', 'getNominators', 'getStakingPools'],
-    },
-  },
-  default: 0,
-  description: 'Number of items to skip',
-},
-{
-  displayName: 'Nominator Address',
-  name: 'nominatorAddress',
-  type: 'string',
-  required: true,
-  displayOptions: {
-    show: {
-      resource: ['staking'],
-      operation: ['getStakes'],
-    },
-  },
-  default: '',
-  description: 'The nominator address to get staking information for',
-},
-{
-  displayName: 'Validator Address',
-  name: 'validatorAddress',
-  type: 'string',
-  required: true,
-  displayOptions: {
-    show: {
-      resource: ['staking'],
-      operation: ['delegateStake'],
-    },
-  },
-  default: '',
-  description: 'The validator address to delegate stake to',
-},
-{
-  displayName: 'Amount',
-  name: 'amount',
-  type: 'string',
-  required: true,
-  displayOptions: {
-    show: {
-      resource: ['staking'],
-      operation: ['delegateStake'],
-    },
-  },
-  default: '',
-  description: 'The amount to stake (in nanoTON)',
-},
-{
-  displayName: 'Nominator Address',
-  name: 'nominatorAddress',
-  type: 'string',
-  required: true,
-  displayOptions: {
-    show: {
-      resource: ['staking'],
-      operation: ['delegateStake'],
-    },
-  },
-  default: '',
-  description: 'The nominator address making the delegation',
-},
     ],
   };
 
@@ -1072,6 +2048,20 @@ export class TON implements INodeType {
     const resource = this.getNodeParameter('resource', 0) as string;
 
     switch (resource) {
+      case 'account':
+        return [await executeAccountOperations.call(this, items)];
+      case 'jetton':
+        return [await executeJettonOperations.call(this, items)];
+      case 'nFT':
+        return [await executeNFTOperations.call(this, items)];
+      case 'transaction':
+        return [await executeTransactionOperations.call(this, items)];
+      case 'domain':
+        return [await executeDomainOperations.call(this, items)];
+      case 'staking':
+        return [await executeStakingOperations.call(this, items)];
+      case 'blockchain':
+        return [await executeBlockchainOperations.call(this, items)];
       case 'wallets':
         return [await executeWalletsOperations.call(this, items)];
       case 'jettons':
@@ -1082,8 +2072,6 @@ export class TON implements INodeType {
         return [await executeSmartContractsOperations.call(this, items)];
       case 'dNS':
         return [await executeDNSOperations.call(this, items)];
-      case 'staking':
-        return [await executeStakingOperations.call(this, items)];
       default:
         throw new NodeOperationError(this.getNode(), `The resource "${resource}" is not supported`);
     }
@@ -1094,1138 +2082,52 @@ export class TON implements INodeType {
 // Resource Handler Functions
 // ============================================================
 
-async function executeWalletsOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
+async function executeAccountOperations(
+	this: IExecuteFunctions,
+	items: INodeExecutionData[],
 ): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-  const credentials = await this.getCredentials('tonApi') as any;
-
-  function validateAddress(address: string): boolean {
-    if (!address) return false;
-    // Basic validation for TON address formats
-    return address.length >= 48 && (address.includes(':') || address.match(/^[A-Za-z0-9_-]+$/));
-  }
-
-  function buildQueryParams(params: Record<string, any>): string {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        searchParams.append(key, String(value));
-      }
-    });
-    return searchParams.toString();
-  }
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-      
-      switch (operation) {
-        case 'getAddressInformation': {
-          const address = this.getNodeParameter('address', i) as string;
-          
-          if (!validateAddress(address)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid address format');
-          }
-
-          const queryParams = buildQueryParams({ address });
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/addressInformation?${queryParams}`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getTransactions': {
-          const address = this.getNodeParameter('address', i) as string;
-          const limit = this.getNodeParameter('limit', i, 10) as number;
-          const lt = this.getNodeParameter('lt', i, '') as string;
-          const hash = this.getNodeParameter('hash', i, '') as string;
-          const to_lt = this.getNodeParameter('to_lt', i, '') as string;
-          
-          if (!validateAddress(address)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid address format');
-          }
-
-          const queryParams = buildQueryParams({ 
-            address, 
-            limit: Math.min(limit, 100), // Limit max to 100 for API constraints
-            lt, 
-            hash, 
-            to_lt 
-          });
-          
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/getTransactions?${queryParams}`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getAddressBook': {
-          const address = this.getNodeParameter('address', i) as string;
-          
-          if (!validateAddress(address)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid address format');
-          }
-
-          const queryParams = buildQueryParams({ address });
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/addressBook?${queryParams}`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'detectAddress': {
-          const address = this.getNodeParameter('address', i) as string;
-          
-          if (!address) {
-            throw new NodeOperationError(this.getNode(), 'Address parameter is required');
-          }
-
-          const queryParams = buildQueryParams({ address });
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/detectAddress?${queryParams}`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'runGetMethod': {
-          const address = this.getNodeParameter('address', i) as string;
-          const method = this.getNodeParameter('method', i) as string;
-          const stackParam = this.getNodeParameter('stack', i, '[]') as string;
-          
-          if (!validateAddress(address)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid address format');
-          }
-
-          if (!method) {
-            throw new NodeOperationError(this.getNode(), 'Method parameter is required');
-          }
-
-          let stack: any[];
-          try {
-            stack = typeof stackParam === 'string' ? JSON.parse(stackParam) : stackParam;
-          } catch (parseError: any) {
-            throw new NodeOperationError(this.getNode(), 'Invalid JSON format for stack parameter');
-          }
-
-          const requestBody: any = {
-            address,
-            method,
-            stack,
-          };
-
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/runGetMethod`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: requestBody,
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-
-      returnData.push({ 
-        json: result, 
-        pairedItem: { item: i } 
-      });
-
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({ 
-          json: { error: error.message }, 
-          pairedItem: { item: i } 
-        });
-      } else {
-        if (error.httpCode) {
-          throw new NodeApiError(this.getNode(), error);
-        } else {
-          throw new NodeOperationError(this.getNode(), error.message);
-        }
-      }
-    }
-  }
-
-  return returnData;
-}
-
-function validateTonAddress(address: string): boolean {
-  if (!address) return false;
-  
-  // Basic TON address validation - can be raw format (0:hex) or user-friendly format
-  const rawFormat = /^-?[0-9]:[a-fA-F0-9]{64}$/;
-  const userFriendlyFormat = /^[a-zA-Z0-9_-]{48}$/;
-  
-  return rawFormat.test(address) || userFriendlyFormat.test(address);
-}
-
-async function executeJettonsOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-  const credentials = await this.getCredentials('tonApi') as any;
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-
-      switch (operation) {
-        case 'getJettonMasters': {
-          const limit = this.getNodeParameter('limit', i) as number;
-          const offset = this.getNodeParameter('offset', i) as number;
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/jetton/masters`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-            },
-            qs: {
-              limit,
-              offset,
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getJettonWallets': {
-          const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
-          const jettonAddress = this.getNodeParameter('jettonAddress', i) as string;
-
-          if (ownerAddress && !validateTonAddress(ownerAddress)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid owner address format');
-          }
-          if (jettonAddress && !validateTonAddress(jettonAddress)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid jetton address format');
-          }
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/jetton/wallets`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-            },
-            qs: {},
-            json: true,
-          };
-
-          if (ownerAddress) options.qs.owner_address = ownerAddress;
-          if (jettonAddress) options.qs.jetton_address = jettonAddress;
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getJettonTransfers': {
-          const jettonAddress = this.getNodeParameter('jettonAddress', i) as string;
-          const direction = this.getNodeParameter('direction', i) as string;
-          const startUtime = this.getNodeParameter('startUtime', i) as number;
-          const endUtime = this.getNodeParameter('endUtime', i) as number;
-
-          if (!validateTonAddress(jettonAddress)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid jetton address format');
-          }
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/jetton/transfers`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-            },
-            qs: {
-              jetton_address: jettonAddress,
-            },
-            json: true,
-          };
-
-          if (direction && direction !== 'both') options.qs.direction = direction;
-          if (startUtime) options.qs.start_utime = startUtime;
-          if (endUtime) options.qs.end_utime = endUtime;
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getJettonBurns': {
-          const jettonAddress = this.getNodeParameter('jettonAddress', i) as string;
-          const startUtime = this.getNodeParameter('startUtime', i) as number;
-          const endUtime = this.getNodeParameter('endUtime', i) as number;
-
-          if (!validateTonAddress(jettonAddress)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid jetton address format');
-          }
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/jetton/burns`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-            },
-            qs: {
-              jetton_address: jettonAddress,
-            },
-            json: true,
-          };
-
-          if (startUtime) options.qs.start_utime = startUtime;
-          if (endUtime) options.qs.end_utime = endUtime;
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'createJettonTransfer': {
-          const jettonAddress = this.getNodeParameter('jettonAddress', i) as string;
-          const fromAddress = this.getNodeParameter('fromAddress', i) as string;
-          const toAddress = this.getNodeParameter('toAddress', i) as string;
-          const amount = this.getNodeParameter('amount', i) as string;
-
-          if (!validateTonAddress(jettonAddress)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid jetton address format');
-          }
-          if (!validateTonAddress(fromAddress)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid from address format');
-          }
-          if (!validateTonAddress(toAddress)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid to address format');
-          }
-          if (!amount || isNaN(Number(amount))) {
-            throw new NodeOperationError(this.getNode(), 'Invalid amount format');
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/jetton/transfer`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: {
-              jetton_address: jettonAddress,
-              from_address: fromAddress,
-              to_address: toAddress,
-              amount: amount,
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-
-      returnData.push({ json: result, pairedItem: { item: i } });
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({
-          json: { error: error.message },
-          pairedItem: { item: i },
-        });
-      } else {
-        if (error.httpCode) {
-          throw new NodeApiError(this.getNode(), error.responseBody, { httpCode: error.httpCode });
-        }
-        throw new NodeOperationError(this.getNode(), error.message);
-      }
-    }
-  }
-
-  return returnData;
-}
-
-function validateTonAddress(address: string): string {
-  if (!address) {
-    throw new Error('Address is required');
-  }
-  
-  // Basic TON address validation - check if it's raw or user-friendly format
-  const rawAddressPattern = /^-?1:[a-fA-F0-9]{64}$/;
-  const userFriendlyPattern = /^[A-Za-z0-9_-]{48}$/;
-  
-  if (!rawAddressPattern.test(address) && !userFriendlyPattern.test(address)) {
-    throw new Error('Invalid TON address format');
-  }
-  
-  return address;
-}
-
-async function executeNFTsOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-  const credentials = await this.getCredentials('tonApi') as any;
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-      
-      switch (operation) {
-        case 'getNftCollections': {
-          const limit = this.getNodeParameter('limit', i, 100) as number;
-          const offset = this.getNodeParameter('offset', i, 0) as number;
-          
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/nft/collections`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-            },
-            qs: {
-              limit,
-              offset,
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'getNftItems': {
-          const collectionAddress = this.getNodeParameter('collection_address', i) as string;
-          const limit = this.getNodeParameter('limit', i, 100) as number;
-          const offset = this.getNodeParameter('offset', i, 0) as number;
-          
-          validateTonAddress(collectionAddress);
-          
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/nft/items`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-            },
-            qs: {
-              collection_address: collectionAddress,
-              limit,
-              offset,
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'getNftTransfers': {
-          const nftAddress = this.getNodeParameter('nft_address', i) as string;
-          const direction = this.getNodeParameter('direction', i, 'both') as string;
-          const startUtime = this.getNodeParameter('start_utime', i, '') as number;
-          const endUtime = this.getNodeParameter('end_utime', i, '') as number;
-          
-          validateTonAddress(nftAddress);
-          
-          const queryParams: any = {
-            nft_address: nftAddress,
-            direction,
-          };
-          
-          if (startUtime) {
-            queryParams.start_utime = startUtime;
-          }
-          
-          if (endUtime) {
-            queryParams.end_utime = endUtime;
-          }
-          
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/nft/transfers`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-            },
-            qs: queryParams,
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'getNftItem': {
-          const address = this.getNodeParameter('address', i) as string;
-          
-          validateTonAddress(address);
-          
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/nft/items/${encodeURIComponent(address)}`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'getNftCollection': {
-          const address = this.getNodeParameter('address', i) as string;
-          
-          validateTonAddress(address);
-          
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/nft/collections/${encodeURIComponent(address)}`,
-            headers: {
-              'X-API-Key': credentials.apiKey,
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-      
-      returnData.push({ json: result, pairedItem: { item: i } });
-      
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({ json: { error: error.message }, pairedItem: { item: i } });
-      } else {
-        throw new NodeApiError(this.getNode(), error);
-      }
-    }
-  }
-  
-  return returnData;
-}
-
-function validateTonAddress(address: string): boolean {
-  if (!address) return false;
-  
-  // Raw address format: 64 hex characters with optional prefix
-  const rawFormat = /^(-?[0-9]+:)?[0-9a-fA-F]{64}$/;
-  
-  // User-friendly format: base64url encoded
-  const friendlyFormat = /^[A-Za-z0-9_-]{48}$/;
-  
-  return rawFormat.test(address) || friendlyFormat.test(address);
-}
-
-function getApiUrl(network: string, endpoint: string): string {
-  const baseUrl = network === 'testnet' 
-    ? 'https://testnet.toncenter.com/api/v3' 
-    : 'https://toncenter.com/api/v3';
-  return `${baseUrl}${endpoint}`;
-}
-
-async function executeSmartContractsOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-  const credentials = await this.getCredentials('tonApi') as any;
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-      const network = this.getNodeParameter('network', i, 'mainnet') as string;
-
-      switch (operation) {
-        case 'runGetMethod': {
-          const address = this.getNodeParameter('address', i) as string;
-          const method = this.getNodeParameter('method', i) as string;
-          const stack = this.getNodeParameter('stack', i, []) as any[];
-
-          if (!validateTonAddress(address)) {
-            throw new NodeOperationError(this.getNode(), `Invalid TON address format: ${address}`);
-          }
-
-          const body = {
-            address,
-            method,
-            stack,
-          };
-
-          const options: any = {
-            method: 'POST',
-            url: getApiUrl(network, '/runGetMethod'),
-            headers: {
-              'X-API-Key': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body,
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'sendBoc': {
-          const boc = this.getNodeParameter('boc', i) as string;
-
-          if (!boc) {
-            throw new NodeOperationError(this.getNode(), 'BOC parameter is required');
-          }
-
-          // Validate base64 encoding
-          try {
-            Buffer.from(boc, 'base64');
-          } catch (error: any) {
-            throw new NodeOperationError(this.getNode(), `Invalid base64 BOC format: ${error.message}`);
-          }
-
-          const body = { boc };
-
-          const options: any = {
-            method: 'POST',
-            url: getApiUrl(network, '/sendBoc'),
-            headers: {
-              'X-API-Key': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body,
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'estimateFee': {
-          const address = this.getNodeParameter('address', i) as string;
-          const body = this.getNodeParameter('body', i) as string;
-          const init_code = this.getNodeParameter('init_code', i, '') as string;
-          const init_data = this.getNodeParameter('init_data', i, '') as string;
-
-          if (!validateTonAddress(address)) {
-            throw new NodeOperationError(this.getNode(), `Invalid TON address format: ${address}`);
-          }
-
-          if (!body) {
-            throw new NodeOperationError(this.getNode(), 'Body parameter is required');
-          }
-
-          const requestBody: any = {
-            address,
-            body,
-          };
-
-          if (init_code) {
-            requestBody.init_code = init_code;
-          }
-
-          if (init_data) {
-            requestBody.init_data = init_data;
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: getApiUrl(network, '/estimateFee'),
-            headers: {
-              'X-API-Key': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: requestBody,
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getConfigParam': {
-          const config_id = this.getNodeParameter('config_id', i) as number;
-
-          if (typeof config_id !== 'number' || config_id < 0) {
-            throw new NodeOperationError(this.getNode(), 'Config ID must be a non-negative number');
-          }
-
-          const options: any = {
-            method: 'GET',
-            url: getApiUrl(network, `/getConfigParam?config_id=${config_id}`),
-            headers: {
-              'X-API-Key': credentials.apiKey,
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'sendQuery': {
-          const address = this.getNodeParameter('address', i) as string;
-          const body = this.getNodeParameter('body', i) as string;
-
-          if (!validateTonAddress(address)) {
-            throw new NodeOperationError(this.getNode(), `Invalid TON address format: ${address}`);
-          }
-
-          if (!body) {
-            throw new NodeOperationError(this.getNode(), 'Body parameter is required');
-          }
-
-          const requestBody = {
-            address,
-            body,
-          };
-
-          const options: any = {
-            method: 'POST',
-            url: getApiUrl(network, '/sendQuery'),
-            headers: {
-              'X-API-Key': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: requestBody,
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-
-      returnData.push({ json: result, pairedItem: { item: i } });
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({ 
-          json: { error: error.message }, 
-          pairedItem: { item: i } 
-        });
-      } else {
-        if (error.httpCode) {
-          throw new NodeApiError(this.getNode(), error);
-        } else {
-          throw new NodeOperationError(this.getNode(), error.message);
-        }
-      }
-    }
-  }
-
-  return returnData;
-}
-
-function validateTonAddress(address: string): boolean {
-  // Basic validation for TON address format
-  if (!address || typeof address !== 'string') {
-    return false;
-  }
-  
-  // Raw address format (64 hex characters)
-  if (/^[0-9a-fA-F]{64}$/.test(address)) {
-    return true;
-  }
-  
-  // User-friendly format (starts with EQ, UQ, or kQ and contains base64 characters)
-  if (/^[EUkQ]{1}[QA-Za-z0-9_-]{46,47}$/.test(address)) {
-    return true;
-  }
-  
-  return false;
-}
-
-async function executeDNSOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-  const credentials = await this.getCredentials('tonApi') as any;
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-      
-      switch (operation) {
-        case 'resolveDns': {
-          const domainName = this.getNodeParameter('domain_name', i) as string;
-          
-          if (!domainName) {
-            throw new NodeOperationError(this.getNode(), 'Domain name is required');
-          }
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/dns/resolve`,
-            headers: {
-              'Authorization': `Bearer ${credentials.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            qs: {
-              domain_name: domainName,
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getDnsDomains': {
-          const limit = this.getNodeParameter('limit', i, 100) as number;
-          const offset = this.getNodeParameter('offset', i, 0) as number;
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/dns/domains`,
-            headers: {
-              'Authorization': `Bearer ${credentials.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            qs: {
-              limit: limit,
-              offset: offset,
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getDnsAuctions': {
-          const limit = this.getNodeParameter('limit', i, 100) as number;
-          const offset = this.getNodeParameter('offset', i, 0) as number;
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/dns/auctions`,
-            headers: {
-              'Authorization': `Bearer ${credentials.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            qs: {
-              limit: limit,
-              offset: offset,
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getDnsDomain': {
-          const domain = this.getNodeParameter('domain', i) as string;
-          
-          if (!domain) {
-            throw new NodeOperationError(this.getNode(), 'Domain is required');
-          }
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/dns/domain/${encodeURIComponent(domain)}`,
-            headers: {
-              'Authorization': `Bearer ${credentials.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'createDnsBid': {
-          const domain = this.getNodeParameter('domain', i) as string;
-          const amount = this.getNodeParameter('amount', i) as string;
-          const bidderAddress = this.getNodeParameter('bidder_address', i) as string;
-          
-          if (!domain) {
-            throw new NodeOperationError(this.getNode(), 'Domain is required');
-          }
-          
-          if (!amount) {
-            throw new NodeOperationError(this.getNode(), 'Amount is required');
-          }
-          
-          if (!bidderAddress) {
-            throw new NodeOperationError(this.getNode(), 'Bidder address is required');
-          }
-          
-          if (!validateTonAddress(bidderAddress)) {
-            throw new NodeOperationError(this.getNode(), 'Invalid TON address format');
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/dns/bids`,
-            headers: {
-              'Authorization': `Bearer ${credentials.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: {
-              domain: domain,
-              amount: amount,
-              bidder_address: bidderAddress,
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-
-      returnData.push({
-        json: result,
-        pairedItem: { item: i },
-      });
-
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({
-          json: { error: error.message },
-          pairedItem: { item: i },
-        });
-      } else {
-        throw new NodeApiError(this.getNode(), error);
-      }
-    }
-  }
-
-  return returnData;
-}
-
-function validateTonAddress(address: string): boolean {
-  // Basic TON address validation
-  if (!address || typeof address !== 'string') {
-    return false;
-  }
-  
-  // Raw address format (64 hex characters)
-  if (/^[0-9a-fA-F]{64}$/.test(address)) {
-    return true;
-  }
-  
-  // User-friendly format (starts with EQ, UQ, or kQ)
-  if (/^(EQ|UQ|kQ)[A-Za-z0-9_-]{46}$/.test(address)) {
-    return true;
-  }
-  
-  return false;
-}
-
-async function executeStakingOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-  const credentials = await this.getCredentials('tonApi') as any;
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-
-      switch (operation) {
-        case 'getValidators': {
-          const limit = this.getNodeParameter('limit', i) as number;
-          const offset = this.getNodeParameter('offset', i) as number;
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/validators`,
-            headers: {
-              'Authorization': `Bearer ${credentials.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            qs: {
-              limit,
-              offset,
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getNominators': {
-          const limit = this.getNodeParameter('limit', i) as number;
-          const offset = this.getNodeParameter('offset', i) as number;
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/nominators`,
-            headers: {
-              'Authorization': `Bearer ${credentials.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            qs: {
-              limit,
-              offset,
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getStakes': {
-          const nominatorAddress = this.getNodeParameter('nominatorAddress', i) as string;
-
-          if (!validateTonAddress(nominatorAddress)) {
-            throw new NodeOperationError(
-              this.getNode(),
-              `Invalid TON address format: ${nominatorAddress}`,
-            );
-          }
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/stakes`,
-            headers: {
-              'Authorization': `Bearer ${credentials.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            qs: {
-              nominator_address: nominatorAddress,
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getStakingPools': {
-          const limit = this.getNodeParameter('limit', i) as number;
-          const offset = this.getNodeParameter('offset', i) as number;
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/staking/pools`,
-            headers: {
-              'Authorization': `Bearer ${credentials.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            qs: {
-              limit,
-              offset,
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'delegateStake': {
-          const validatorAddress = this.getNodeParameter('validatorAddress', i) as string;
-          const amount = this.getNodeParameter('amount', i) as string;
-          const nominatorAddress = this.getNodeParameter('nominatorAddress', i) as string;
-
-          if (!validateTonAddress(validatorAddress)) {
-            throw new NodeOperationError(
-              this.getNode(),
-              `Invalid validator address format: ${validatorAddress}`,
-            );
-          }
-
-          if (!validateTonAddress(nominatorAddress)) {
-            throw new NodeOperationError(
-              this.getNode(),
-              `Invalid nominator address format: ${nominatorAddress}`,
-            );
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/staking/delegate`,
-            headers: {
-              'Authorization': `Bearer ${credentials.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: {
-              validator_address: validatorAddress,
-              amount,
-              nominator_address: nominatorAddress,
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-
-      returnData.push({
-        json: result,
-        pairedItem: { item: i },
-      });
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({
-          json: { error: error.message },
-          pairedItem: { item: i },
-        });
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  return returnData;
-}
+	const returnData: INodeExecutionData[] = [];
+	const operation = this.getNodeParameter('operation', 0) as string;
+	const credentials = await this.getCredentials('tonApi') as any;
+
+	for (let i = 0; i < items.length; i++) {
+		try {
+			let result: any;
+
+			switch (operation) {
+				case 'getAccount': {
+					const accountId = this.getNodeParameter('accountId', i) as string;
+					const options: any = {
+						method: 'GET',
+						url: `${credentials.baseUrl}/accounts/${accountId}`,
+						headers: {
+							Authorization: `Bearer ${credentials.apiKey}`,
+							'Content-Type': 'application/json',
+						},
+						json: true,
+					};
+					result = await this.helpers.httpRequest(options) as any;
+					break;
+				}
+
+				case 'runGetMethod': {
+					const accountId = this.getNodeParameter('accountId', i) as string;
+					const methodName = this.getNodeParameter('methodName', i) as string;
+					const args = this.getNodeParameter('args', i) as string;
+
+					const queryParams = new URLSearchParams();
+					if (args) {
+						queryParams.append('args', args);
+					}
+
+					const options: any = {
+						method: 'GET',
+						url: `${credentials.baseUrl}/accounts/${accountId}/methods/${methodName}${queryParams.toString() ? '?' + queryParams.toString() : ''}`,
+						headers: {
+							Authorization: `Bearer ${credentials.apiKey}`,
+							'Content-Type': 'application/json',
+						},
+						json: true,
+					};
+					result = await this.helpers.httpRequest(options) as any;
+					break
