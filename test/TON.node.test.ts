@@ -33,20 +33,20 @@ describe('TON Node', () => {
       expect(node.description.outputs).toContain('main');
     });
 
-    it('should define 6 resources', () => {
+    it('should define 7 resources', () => {
       const resourceProp = node.description.properties.find(
         (p: any) => p.name === 'resource'
       );
       expect(resourceProp).toBeDefined();
       expect(resourceProp!.type).toBe('options');
-      expect(resourceProp!.options).toHaveLength(6);
+      expect(resourceProp!.options).toHaveLength(7);
     });
 
     it('should have operation dropdowns for each resource', () => {
       const operations = node.description.properties.filter(
         (p: any) => p.name === 'operation'
       );
-      expect(operations.length).toBe(6);
+      expect(operations.length).toBe(7);
     });
 
     it('should require credentials', () => {
@@ -67,334 +67,277 @@ describe('TON Node', () => {
   });
 
   // Resource-specific tests
-describe('Wallets Resource', () => {
-  let mockExecuteFunctions: any;
+describe('Account Resource', () => {
+	let mockExecuteFunctions: any;
 
-  beforeEach(() => {
-    mockExecuteFunctions = {
-      getNodeParameter: jest.fn(),
-      getCredentials: jest.fn().mockResolvedValue({
-        apiKey: 'test-api-key',
-        baseUrl: 'https://toncenter.com/api/v3',
-      }),
-      getInputData: jest.fn().mockReturnValue([{ json: {} }]),
-      getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
-      continueOnFail: jest.fn().mockReturnValue(false),
-      helpers: {
-        httpRequest: jest.fn(),
-        requestWithAuthentication: jest.fn(),
-      },
-    };
-  });
+	beforeEach(() => {
+		mockExecuteFunctions = {
+			getNodeParameter: jest.fn(),
+			getCredentials: jest.fn().mockResolvedValue({
+				bearerToken: 'test-token',
+				baseUrl: 'https://tonapi.io/v2',
+			}),
+			getInputData: jest.fn().mockReturnValue([{ json: {} }]),
+			getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
+			continueOnFail: jest.fn().mockReturnValue(false),
+			helpers: {
+				httpRequest: jest.fn(),
+			},
+		};
+	});
 
-  describe('getAddressInformation', () => {
-    it('should successfully get address information', async () => {
-      const mockResponse = {
-        balance: '1000000000',
-        state: 'active',
-        code: 'base64encoded',
-        data: 'base64encoded'
-      };
+	it('should get account info successfully', async () => {
+		const mockResponse = { account_id: 'test-account', balance: 1000 };
+		mockExecuteFunctions.getNodeParameter
+			.mockReturnValueOnce('getAccount')
+			.mockReturnValueOnce('EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF');
+		mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        if (param === 'operation') return 'getAddressInformation';
-        if (param === 'address') return 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t';
-        return undefined;
-      });
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+		expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+		expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+			method: 'GET',
+			url: 'https://tonapi.io/v2/accounts/EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF',
+			headers: {
+				Authorization: 'Bearer test-token',
+				'Content-Type': 'application/json',
+			},
+			json: true,
+		});
+	});
 
-      const result = await executeWalletsOperations.call(mockExecuteFunctions, [{ json: {} }]);
+	it('should run get method successfully', async () => {
+		const mockResponse = { result: [100] };
+		mockExecuteFunctions.getNodeParameter
+			.mockReturnValueOnce('runGetMethod')
+			.mockReturnValueOnce('EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF')
+			.mockReturnValueOnce('get_balance')
+			.mockReturnValueOnce('[]');
+		mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'GET',
-        url: 'https://toncenter.com/api/v3/addressInformation?address=EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t',
-        headers: {
-          'X-API-Key': 'test-api-key',
-          'Content-Type': 'application/json',
-        },
-        json: true,
-      });
-    });
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-    it('should handle invalid address format', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        if (param === 'operation') return 'getAddressInformation';
-        if (param === 'address') return 'invalid-address';
-        return undefined;
-      });
+		expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+	});
 
-      await expect(executeWalletsOperations.call(mockExecuteFunctions, [{ json: {} }]))
-        .rejects.toThrow('Invalid address format');
-    });
-  });
+	it('should get account jettons successfully', async () => {
+		const mockResponse = { balances: [] };
+		mockExecuteFunctions.getNodeParameter
+			.mockReturnValueOnce('getAccountJettons')
+			.mockReturnValueOnce('EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF')
+			.mockReturnValueOnce('ton,usdt');
+		mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-  describe('getTransactions', () => {
-    it('should successfully get transactions', async () => {
-      const mockResponse = {
-        transactions: [
-          { hash: 'tx1', lt: '123456', value: '100000000' },
-          { hash: 'tx2', lt: '123455', value: '200000000' }
-        ]
-      };
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number, defaultValue?: any) => {
-        if (param === 'operation') return 'getTransactions';
-        if (param === 'address') return 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t';
-        if (param === 'limit') return defaultValue || 10;
-        return defaultValue || '';
-      });
+		expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+	});
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+	it('should get account events successfully', async () => {
+		const mockResponse = { events: [] };
+		mockExecuteFunctions.getNodeParameter
+			.mockReturnValueOnce('getAccountEvents')
+			.mockReturnValueOnce('EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF')
+			.mockReturnValueOnce(100)
+			.mockReturnValueOnce('2024-01-01T00:00:00Z')
+			.mockReturnValueOnce('2024-01-02T00:00:00Z');
+		mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      const result = await executeWalletsOperations.call(mockExecuteFunctions, [{ json: {} }]);
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-    });
-  });
+		expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+	});
 
-  describe('runGetMethod', () => {
-    it('should successfully run get method', async () => {
-      const mockResponse = {
-        gas_used: 1000,
-        exit_code: 0,
-        stack: [['num', '0x64']]
-      };
+	it('should get bulk accounts successfully', async () => {
+		const mockResponse = { accounts: [] };
+		mockExecuteFunctions.getNodeParameter
+			.mockReturnValueOnce('getBulkAccounts')
+			.mockReturnValueOnce('EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF,EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c');
+		mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number, defaultValue?: any) => {
-        if (param === 'operation') return 'runGetMethod';
-        if (param === 'address') return 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t';
-        if (param === 'method') return 'get_balance';
-        if (param === 'stack') return '[]';
-        return defaultValue;
-      });
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+		expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+	});
 
-      const result = await executeWalletsOperations.call(mockExecuteFunctions, [{ json: {} }]);
+	it('should get account diff successfully', async () => {
+		const mockResponse = { diff: {} };
+		mockExecuteFunctions.getNodeParameter
+			.mockReturnValueOnce('getAccountDiff')
+			.mockReturnValueOnce('EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF')
+			.mockReturnValueOnce('2024-01-01T00:00:00Z')
+			.mockReturnValueOnce('2024-01-02T00:00:00Z');
+		mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'POST',
-        url: 'https://toncenter.com/api/v3/runGetMethod',
-        headers: {
-          'X-API-Key': 'test-api-key',
-          'Content-Type': 'application/json',
-        },
-        body: {
-          address: 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t',
-          method: 'get_balance',
-          stack: [],
-        },
-        json: true,
-      });
-    });
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-    it('should handle invalid JSON in stack parameter', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        if (param === 'operation') return 'runGetMethod';
-        if (param === 'address') return 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t';
-        if (param === 'method') return 'get_balance';
-        if (param === 'stack') return 'invalid-json';
-        return undefined;
-      });
+		expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+	});
 
-      await expect(executeWalletsOperations.call(mockExecuteFunctions, [{ json: {} }]))
-        .rejects.toThrow('Invalid JSON format for stack parameter');
-    });
-  });
+	it('should handle errors when continueOnFail is true', async () => {
+		mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getAccount');
+		mockExecuteFunctions.continueOnFail.mockReturnValue(true);
+		mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
 
-  describe('error handling', () => {
-    it('should handle API errors when continueOnFail is true', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        if (param === 'operation') return 'getAddressInformation';
-        if (param === 'address') return 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t';
-        return undefined;
-      });
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.continueOnFail.mockReturnValue(true);
-      mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
+		expect(result).toEqual([{ json: { error: 'API Error' }, pairedItem: { item: 0 } }]);
+	});
 
-      const result = await executeWalletsOperations.call(mockExecuteFunctions, [{ json: {} }]);
+	it('should throw errors when continueOnFail is false', async () => {
+		mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getAccount');
+		mockExecuteFunctions.continueOnFail.mockReturnValue(false);
+		mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
 
-      expect(result).toEqual([{ json: { error: 'API Error' }, pairedItem: { item: 0 } }]);
-    });
-  });
+		await expect(executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }])).rejects.toThrow('API Error');
+	});
 });
 
-describe('Jettons Resource', () => {
-  let mockExecuteFunctions: any;
+describe('Jetton Resource', () => {
+	let mockExecuteFunctions: any;
 
-  beforeEach(() => {
-    mockExecuteFunctions = {
-      getNodeParameter: jest.fn(),
-      getCredentials: jest.fn().mockResolvedValue({
-        apiKey: 'test-api-key',
-        baseUrl: 'https://toncenter.com/api/v3',
-      }),
-      getInputData: jest.fn().mockReturnValue([{ json: {} }]),
-      getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
-      continueOnFail: jest.fn().mockReturnValue(false),
-      helpers: {
-        httpRequest: jest.fn(),
-        requestWithAuthentication: jest.fn(),
-      },
-    };
-  });
+	beforeEach(() => {
+		mockExecuteFunctions = {
+			getNodeParameter: jest.fn(),
+			getCredentials: jest.fn().mockResolvedValue({
+				apiKey: 'test-key',
+				baseUrl: 'https://tonapi.io/v2'
+			}),
+			getInputData: jest.fn().mockReturnValue([{ json: {} }]),
+			getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
+			continueOnFail: jest.fn().mockReturnValue(false),
+			helpers: {
+				httpRequest: jest.fn(),
+				requestWithAuthentication: jest.fn()
+			},
+		};
+	});
 
-  describe('getJettonMasters', () => {
-    it('should get jetton masters successfully', async () => {
-      const mockResponse = {
-        jetton_masters: [
-          { address: '0:123...', total_supply: '1000000' }
-        ]
-      };
+	describe('getJetton operation', () => {
+		it('should get jetton successfully', async () => {
+			const jettonData = { address: '0:123', symbol: 'TEST', decimals: 9 };
+			mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
+				if (param === 'operation') return 'getJetton';
+				if (param === 'jettonId') return '0:123';
+				return null;
+			});
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(jettonData);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getJettonMasters';
-          case 'limit': return 10;
-          case 'offset': return 0;
-          default: return undefined;
-        }
-      });
+			const result = await executeJettonOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+			expect(result).toEqual([{ json: jettonData, pairedItem: { item: 0 } }]);
+			expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+				method: 'GET',
+				url: 'https://tonapi.io/v2/jettons/0:123',
+				headers: { Authorization: 'Bearer test-key' },
+				json: true,
+			});
+		});
 
-      const result = await executeJettonsOperations.call(mockExecuteFunctions, [{ json: {} }]);
+		it('should handle getJetton error', async () => {
+			mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
+				if (param === 'operation') return 'getJetton';
+				if (param === 'jettonId') return '0:123';
+				return null;
+			});
+			mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
+			mockExecuteFunctions.continueOnFail.mockReturnValue(true);
 
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'GET',
-        url: 'https://toncenter.com/api/v3/jetton/masters',
-        headers: { 'X-API-Key': 'test-api-key' },
-        qs: { limit: 10, offset: 0 },
-        json: true,
-      });
-    });
+			const result = await executeJettonOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-    it('should handle errors properly', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        if (param === 'operation') return 'getJettonMasters';
-        return 10;
-      });
+			expect(result).toEqual([{ json: { error: 'API Error' }, pairedItem: { item: 0 } }]);
+		});
+	});
 
-      mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
+	describe('getJettons operation', () => {
+		it('should get jettons list successfully', async () => {
+			const jettonsData = { jettons: [], total: 0 };
+			mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
+				if (param === 'operation') return 'getJettons';
+				if (param === 'limit') return 100;
+				if (param === 'offset') return 0;
+				return null;
+			});
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(jettonsData);
 
-      await expect(
-        executeJettonsOperations.call(mockExecuteFunctions, [{ json: {} }])
-      ).rejects.toThrow('API Error');
-    });
-  });
+			const result = await executeJettonOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-  describe('getJettonWallets', () => {
-    it('should get jetton wallets successfully', async () => {
-      const mockResponse = {
-        jetton_wallets: [
-          { address: '0:456...', balance: '500000', jetton: '0:123...' }
-        ]
-      };
+			expect(result).toEqual([{ json: jettonsData, pairedItem: { item: 0 } }]);
+		});
+	});
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getJettonWallets';
-          case 'ownerAddress': return '0:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-          case 'jettonAddress': return '0:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
-          default: return undefined;
-        }
-      });
+	describe('getJettonHolders operation', () => {
+		it('should get jetton holders successfully', async () => {
+			const holdersData = { holders: [], total: 0 };
+			mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
+				if (param === 'operation') return 'getJettonHolders';
+				if (param === 'jettonId') return '0:123';
+				if (param === 'limit') return 100;
+				if (param === 'offset') return 0;
+				return null;
+			});
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(holdersData);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+			const result = await executeJettonOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      const result = await executeJettonsOperations.call(mockExecuteFunctions, [{ json: {} }]);
+			expect(result).toEqual([{ json: holdersData, pairedItem: { item: 0 } }]);
+		});
+	});
 
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-    });
+	describe('getBulkJettons operation', () => {
+		it('should get bulk jettons successfully', async () => {
+			const bulkData = { jettons: [] };
+			mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
+				if (param === 'operation') return 'getBulkJettons';
+				if (param === 'jettonIds') return '0:123,0:456';
+				return null;
+			});
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(bulkData);
 
-    it('should validate addresses', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getJettonWallets';
-          case 'ownerAddress': return 'invalid-address';
-          default: return '';
-        }
-      });
+			const result = await executeJettonOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      await expect(
-        executeJettonsOperations.call(mockExecuteFunctions, [{ json: {} }])
-      ).rejects.toThrow('Invalid owner address format');
-    });
-  });
+			expect(result).toEqual([{ json: bulkData, pairedItem: { item: 0 } }]);
+			expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+				method: 'POST',
+				url: 'https://tonapi.io/v2/jettons/_bulk',
+				headers: { Authorization: 'Bearer test-key', 'Content-Type': 'application/json' },
+				body: { jetton_ids: ['0:123', '0:456'] },
+				json: true,
+			});
+		});
+	});
 
-  describe('createJettonTransfer', () => {
-    it('should create jetton transfer successfully', async () => {
-      const mockResponse = {
-        success: true,
-        transaction_hash: 'abc123...'
-      };
+	describe('getJettonTransfers operation', () => {
+		it('should get jetton transfers successfully', async () => {
+			const transfersData = { transfers: [], total: 0 };
+			mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
+				if (param === 'operation') return 'getJettonTransfers';
+				if (param === 'jettonId') return '0:123';
+				if (param === 'limit') return 100;
+				if (param === 'offset') return 0;
+				if (param === 'startDate') return '';
+				if (param === 'endDate') return '';
+				return null;
+			});
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(transfersData);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'createJettonTransfer';
-          case 'jettonAddress': return '0:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-          case 'fromAddress': return '0:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
-          case 'toAddress': return '0:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321';
-          case 'amount': return '1000000';
-          default: return undefined;
-        }
-      });
+			const result = await executeJettonOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeJettonsOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'POST',
-        url: 'https://toncenter.com/api/v3/jetton/transfer',
-        headers: {
-          'X-API-Key': 'test-api-key',
-          'Content-Type': 'application/json',
-        },
-        body: {
-          jetton_address: '0:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-          from_address: '0:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-          to_address: '0:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321',
-          amount: '1000000',
-        },
-        json: true,
-      });
-    });
-
-    it('should validate transfer parameters', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'createJettonTransfer';
-          case 'jettonAddress': return 'invalid-address';
-          default: return '';
-        }
-      });
-
-      await expect(
-        executeJettonsOperations.call(mockExecuteFunctions, [{ json: {} }])
-      ).rejects.toThrow('Invalid jetton address format');
-    });
-  });
+			expect(result).toEqual([{ json: transfersData, pairedItem: { item: 0 } }]);
+		});
+	});
 });
 
-describe('NFTs Resource', () => {
+describe('NFT Resource', () => {
   let mockExecuteFunctions: any;
 
   beforeEach(() => {
     mockExecuteFunctions = {
       getNodeParameter: jest.fn(),
       getCredentials: jest.fn().mockResolvedValue({
-        apiKey: 'test-api-key',
-        baseUrl: 'https://toncenter.com/api/v3',
+        bearerToken: 'test-token',
+        baseUrl: 'https://tonapi.io/v2',
       }),
       getInputData: jest.fn().mockReturnValue([{ json: {} }]),
       getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
@@ -406,803 +349,709 @@ describe('NFTs Resource', () => {
     };
   });
 
-  test('should get NFT collections successfully', async () => {
-    const mockCollections = { collections: [{ address: 'test-collection' }] };
+  it('should get NFT collections successfully', async () => {
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('getNFTCollections')
+      .mockReturnValueOnce(50)
+      .mockReturnValueOnce(0);
     
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'getNftCollections';
-        case 'limit': return 100;
-        case 'offset': return 0;
-        default: return undefined;
-      }
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({
+      collections: [],
     });
-    
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockCollections);
-    
-    const items = [{ json: {} }];
-    const result = await executeNFTsOperations.call(mockExecuteFunctions, items);
-    
+
+    const result = await executeNFTOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
     expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockCollections);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: 'https://tonapi.io/v2/nfts/collections',
+      headers: {
+        Authorization: 'Bearer test-token',
+      },
+      qs: {
+        limit: 50,
+        offset: 0,
+      },
+      json: true,
+    });
   });
 
-  test('should get NFT items for collection successfully', async () => {
-    const mockItems = { items: [{ address: 'test-item' }] };
+  it('should get NFT collection info successfully', async () => {
+    const collectionAddress = 'EQD2_7ql9l0Z5mDyFxMm4iOhH3yd6xvqZm7-MlXPrEaADxpK';
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('getNFTCollection')
+      .mockReturnValueOnce(collectionAddress);
     
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'getNftItems';
-        case 'collection_address': return '-1:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-        case 'limit': return 100;
-        case 'offset': return 0;
-        default: return undefined;
-      }
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({
+      collection: {},
     });
-    
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockItems);
-    
-    const items = [{ json: {} }];
-    const result = await executeNFTsOperations.call(mockExecuteFunctions, items);
-    
+
+    const result = await executeNFTOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
     expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockItems);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: `https://tonapi.io/v2/nfts/collections/${collectionAddress}`,
+      headers: {
+        Authorization: 'Bearer test-token',
+      },
+      json: true,
+    });
   });
 
-  test('should get NFT transfers successfully', async () => {
-    const mockTransfers = { transfers: [{ from: 'test-from', to: 'test-to' }] };
+  it('should get collection items successfully', async () => {
+    const collectionAddress = 'EQD2_7ql9l0Z5mDyFxMm4iOhH3yd6xvqZm7-MlXPrEaADxpK';
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('getCollectionItems')
+      .mockReturnValueOnce(collectionAddress)
+      .mockReturnValueOnce(50)
+      .mockReturnValueOnce(0);
     
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'getNftTransfers';
-        case 'nft_address': return '-1:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-        case 'direction': return 'both';
-        case 'start_utime': return '';
-        case 'end_utime': return '';
-        default: return undefined;
-      }
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({
+      items: [],
     });
-    
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockTransfers);
-    
-    const items = [{ json: {} }];
-    const result = await executeNFTsOperations.call(mockExecuteFunctions, items);
-    
+
+    const result = await executeNFTOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
     expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockTransfers);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: `https://tonapi.io/v2/nfts/collections/${collectionAddress}/items`,
+      headers: {
+        Authorization: 'Bearer test-token',
+      },
+      qs: {
+        limit: 50,
+        offset: 0,
+      },
+      json: true,
+    });
   });
 
-  test('should get NFT item details successfully', async () => {
-    const mockItem = { address: 'test-item', metadata: {} };
+  it('should get NFT info successfully', async () => {
+    const nftAddress = 'EQANHCRwKOe9B-H-1vPK3m8AzQ5L6S2QqIlWJfcJKTUi7_Ul';
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('getNFT')
+      .mockReturnValueOnce(nftAddress);
     
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'getNftItem';
-        case 'address': return '-1:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-        default: return undefined;
-      }
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({
+      nft: {},
     });
-    
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockItem);
-    
-    const items = [{ json: {} }];
-    const result = await executeNFTsOperations.call(mockExecuteFunctions, items);
-    
+
+    const result = await executeNFTOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
     expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockItem);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: `https://tonapi.io/v2/nfts/${nftAddress}`,
+      headers: {
+        Authorization: 'Bearer test-token',
+      },
+      json: true,
+    });
   });
 
-  test('should get NFT collection details successfully', async () => {
-    const mockCollection = { address: 'test-collection', metadata: {} };
+  it('should get NFT history successfully', async () => {
+    const nftAddress = 'EQANHCRwKOe9B-H-1vPK3m8AzQ5L6S2QqIlWJfcJKTUi7_Ul';
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('getNFTHistory')
+      .mockReturnValueOnce(nftAddress)
+      .mockReturnValueOnce(50)
+      .mockReturnValueOnce('2024-01-01T00:00:00.000Z')
+      .mockReturnValueOnce('2024-01-31T23:59:59.999Z');
     
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'getNftCollection';
-        case 'address': return '-1:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-        default: return undefined;
-      }
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({
+      history: [],
     });
-    
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockCollection);
-    
-    const items = [{ json: {} }];
-    const result = await executeNFTsOperations.call(mockExecuteFunctions, items);
-    
+
+    const result = await executeNFTOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
     expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockCollection);
-  });
-
-  test('should handle invalid address format', async () => {
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'getNftItem';
-        case 'address': return 'invalid-address';
-        default: return undefined;
-      }
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: `https://tonapi.io/v2/nfts/${nftAddress}/history`,
+      headers: {
+        Authorization: 'Bearer test-token',
+      },
+      qs: {
+        limit: 50,
+        start_date: 1704067200,
+        end_date: 1706745599,
+      },
+      json: true,
     });
-    
-    const items = [{ json: {} }];
-    
-    await expect(executeNFTsOperations.call(mockExecuteFunctions, items))
-      .rejects.toThrow('Invalid TON address format');
   });
 
-  test('should handle API errors gracefully when continueOnFail is true', async () => {
+  it('should get bulk NFTs successfully', async () => {
+    const nftAddresses = 'EQANHCRwKOe9B-H-1vPK3m8AzQ5L6S2QqIlWJfcJKTUi7_Ul,EQD2_7ql9l0Z5mDyFxMm4iOhH3yd6xvqZm7-MlXPrEaADxpK';
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('getBulkNFTs')
+      .mockReturnValueOnce(nftAddresses);
+    
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({
+      nfts: [],
+    });
+
+    const result = await executeNFTOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+    expect(result).toHaveLength(1);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'https://tonapi.io/v2/nfts/_bulk',
+      headers: {
+        Authorization: 'Bearer test-token',
+        'Content-Type': 'application/json',
+      },
+      body: {
+        nft_addresses: ['EQANHCRwKOe9B-H-1vPK3m8AzQ5L6S2QqIlWJfcJKTUi7_Ul', 'EQD2_7ql9l0Z5mDyFxMm4iOhH3yd6xvqZm7-MlXPrEaADxpK'],
+      },
+      json: true,
+    });
+  });
+
+  it('should handle errors and continue on fail', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getNFTCollections');
     mockExecuteFunctions.continueOnFail.mockReturnValue(true);
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'getNftCollections';
-        case 'limit': return 100;
-        case 'offset': return 0;
-        default: return undefined;
-      }
-    });
-    
     mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
-    
-    const items = [{ json: {} }];
-    const result = await executeNFTsOperations.call(mockExecuteFunctions, items);
-    
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual({ error: 'API Error' });
-  });
-});
 
-describe('SmartContracts Resource', () => {
-  let mockExecuteFunctions: any;
-
-  beforeEach(() => {
-    mockExecuteFunctions = {
-      getNodeParameter: jest.fn(),
-      getCredentials: jest.fn().mockResolvedValue({
-        apiKey: 'test-api-key',
-        baseUrl: 'https://toncenter.com/api/v3',
-      }),
-      getInputData: jest.fn().mockReturnValue([{ json: {} }]),
-      getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
-      continueOnFail: jest.fn().mockReturnValue(false),
-      helpers: {
-        httpRequest: jest.fn(),
-        requestWithAuthentication: jest.fn(),
-      },
-    };
-  });
-
-  test('runGetMethod should execute smart contract get method', async () => {
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'runGetMethod';
-        case 'address': return 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t';
-        case 'method': return 'get_balance';
-        case 'stack': return [];
-        case 'network': return 'mainnet';
-        default: return undefined;
-      }
-    });
-
-    const mockResponse = {
-      ok: true,
-      result: {
-        gas_used: 100,
-        stack: [['num', '1000000000']],
-        exit_code: 0,
-      },
-    };
-
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-    const result = await executeSmartContractsOperations.call(
-      mockExecuteFunctions,
-      [{ json: {} }]
-    );
+    const result = await executeNFTOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
     expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: 'POST',
-        url: 'https://toncenter.com/api/v3/runGetMethod',
-        body: {
-          address: 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t',
-          method: 'get_balance',
-          stack: [],
-        },
-      })
-    );
+    expect(result[0].json.error).toBe('API Error');
   });
 
-  test('sendBoc should send transaction to blockchain', async () => {
-    const testBoc = Buffer.from('test transaction data').toString('base64');
-    
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'sendBoc';
-        case 'boc': return testBoc;
-        case 'network': return 'mainnet';
-        default: return undefined;
-      }
-    });
-
-    const mockResponse = {
-      ok: true,
-      result: {
-        message_hash: 'abcd1234567890',
-      },
-    };
-
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-    const result = await executeSmartContractsOperations.call(
-      mockExecuteFunctions,
-      [{ json: {} }]
-    );
-
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: 'POST',
-        url: 'https://toncenter.com/api/v3/sendBoc',
-        body: { boc: testBoc },
-      })
-    );
-  });
-
-  test('estimateFee should estimate transaction fees', async () => {
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'estimateFee';
-        case 'address': return 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t';
-        case 'body': return 'te6ccgEBAQEAJAAAQ4ABAP0U+r49EOJ7JAqSLMVNG1IPK5xQiquPS//NcmapoOnr/VhpL0';
-        case 'init_code': return '';
-        case 'init_data': return '';
-        case 'network': return 'mainnet';
-        default: return undefined;
-      }
-    });
-
-    const mockResponse = {
-      ok: true,
-      result: {
-        source_fees: {
-          in_fwd_fee: 1000000,
-          storage_fee: 0,
-          gas_fee: 1000000,
-          fwd_fee: 666672,
-        },
-      },
-    };
-
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-    const result = await executeSmartContractsOperations.call(
-      mockExecuteFunctions,
-      [{ json: {} }]
-    );
-
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-  });
-
-  test('getConfigParam should get blockchain configuration', async () => {
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'getConfigParam';
-        case 'config_id': return 15;
-        case 'network': return 'mainnet';
-        default: return undefined;
-      }
-    });
-
-    const mockResponse = {
-      ok: true,
-      result: {
-        config: {
-          validators_elected_for: 65536,
-          elections_start_before: 32768,
-        },
-      },
-    };
-
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-    const result = await executeSmartContractsOperations.call(
-      mockExecuteFunctions,
-      [{ json: {} }]
-    );
-
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: 'GET',
-        url: 'https://toncenter.com/api/v3/getConfigParam?config_id=15',
-      })
-    );
-  });
-
-  test('should handle invalid address format', async () => {
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'runGetMethod';
-        case 'address': return 'invalid-address';
-        case 'method': return 'get_balance';
-        case 'stack': return [];
-        case 'network': return 'mainnet';
-        default: return undefined;
-      }
-    });
+  it('should throw error when continue on fail is false', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getNFTCollections');
+    mockExecuteFunctions.continueOnFail.mockReturnValue(false);
+    mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
 
     await expect(
-      executeSmartContractsOperations.call(mockExecuteFunctions, [{ json: {} }])
-    ).rejects.toThrow('Invalid TON address format');
-  });
-
-  test('should handle API errors', async () => {
-    mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
-      switch (paramName) {
-        case 'operation': return 'runGetMethod';
-        case 'address': return 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t';
-        case 'method': return 'get_balance';
-        case 'stack': return [];
-        case 'network': return 'mainnet';
-        default: return undefined;
-      }
-    });
-
-    const apiError = new Error('API Error');
-    (apiError as any).httpCode = 400;
-    mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(apiError);
-
-    await expect(
-      executeSmartContractsOperations.call(mockExecuteFunctions, [{ json: {} }])
+      executeNFTOperations.call(mockExecuteFunctions, [{ json: {} }])
     ).rejects.toThrow('API Error');
   });
+
+  it('should throw error for unknown operation', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('unknownOperation');
+
+    await expect(
+      executeNFTOperations.call(mockExecuteFunctions, [{ json: {} }])
+    ).rejects.toThrow('Unknown operation: unknownOperation');
+  });
 });
 
-describe('DNS Resource', () => {
+describe('Transaction Resource', () => {
   let mockExecuteFunctions: any;
 
   beforeEach(() => {
     mockExecuteFunctions = {
       getNodeParameter: jest.fn(),
-      getCredentials: jest.fn().mockResolvedValue({
-        apiKey: 'test-api-key',
-        baseUrl: 'https://toncenter.com/api/v3',
+      getCredentials: jest.fn().mockResolvedValue({ 
+        bearerToken: 'test-token', 
+        baseUrl: 'https://tonapi.io/v2' 
+      }),
+      getInputData: jest.fn().mockReturnValue([{ json: {} }]),
+      getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
+      continueOnFail: jest.fn().mockReturnValue(false),
+      helpers: { 
+        httpRequest: jest.fn() 
+      },
+    };
+  });
+
+  it('should get transaction by hash', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getTransaction');
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('abc123');
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({ hash: 'abc123', status: 'success' });
+
+    const result = await executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: 'https://tonapi.io/v2/blockchain/transactions/abc123',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json'
+      },
+      json: true
+    });
+    expect(result).toEqual([{ json: { hash: 'abc123', status: 'success' }, pairedItem: { item: 0 } }]);
+  });
+
+  it('should handle errors gracefully when continueOnFail is true', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getTransaction');
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('invalid');
+    mockExecuteFunctions.continueOnFail.mockReturnValue(true);
+    mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('Not found'));
+
+    const result = await executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+    expect(result).toEqual([{ json: { error: 'Not found' }, pairedItem: { item: 0 } }]);
+  });
+
+  it('should get bulk transactions', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getBulkTransactions');
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('hash1,hash2,hash3');
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue([{ hash: 'hash1' }, { hash: 'hash2' }]);
+
+    const result = await executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'https://tonapi.io/v2/blockchain/transactions/_bulk',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json'
+      },
+      body: {
+        transaction_ids: ['hash1', 'hash2', 'hash3']
+      },
+      json: true
+    });
+    expect(result).toEqual([{ json: [{ hash: 'hash1' }, { hash: 'hash2' }], pairedItem: { item: 0 } }]);
+  });
+
+  it('should get transactions with filters', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getTransactions');
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce(0);
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('8000000000000000');
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce(123456);
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce(50);
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({ transactions: [] });
+
+    const result = await executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'GET',
+        url: expect.stringContaining('/blockchain/transactions?'),
+        headers: {
+          'Authorization': 'Bearer test-token',
+          'Content-Type': 'application/json'
+        },
+        json: true
+      })
+    );
+    expect(result).toEqual([{ json: { transactions: [] }, pairedItem: { item: 0 } }]);
+  });
+
+  it('should get transaction trace', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getTransactionTrace');
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('abc123');
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({ trace: 'execution_trace' });
+
+    const result = await executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: 'https://tonapi.io/v2/blockchain/transactions/abc123/trace',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json'
+      },
+      json: true
+    });
+    expect(result).toEqual([{ json: { trace: 'execution_trace' }, pairedItem: { item: 0 } }]);
+  });
+
+  it('should emulate transaction', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('emulateTransaction');
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('te6ccgEBAQEAKgAAT4AJxYOcYO...BOC_DATA');
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({ success: true, result: 'emulation_result' });
+
+    const result = await executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'https://tonapi.io/v2/wallet/emulate',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json'
+      },
+      body: {
+        boc: 'te6ccgEBAQEAKgAAT4AJxYOcYO...BOC_DATA'
+      },
+      json: true
+    });
+    expect(result).toEqual([{ json: { success: true, result: 'emulation_result' }, pairedItem: { item: 0 } }]);
+  });
+});
+
+describe('Domain Resource', () => {
+  let mockExecuteFunctions: any;
+
+  beforeEach(() => {
+    mockExecuteFunctions = {
+      getNodeParameter: jest.fn(),
+      getCredentials: jest.fn().mockResolvedValue({ 
+        bearer_token: 'test-token',
+        baseUrl: 'https://tonapi.io/v2'
       }),
       getInputData: jest.fn().mockReturnValue([{ json: {} }]),
       getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
       continueOnFail: jest.fn().mockReturnValue(false),
       helpers: {
         httpRequest: jest.fn(),
-        requestWithAuthentication: jest.fn(),
+        requestWithAuthentication: jest.fn()
       },
     };
   });
 
-  describe('resolveDns', () => {
-    it('should resolve DNS domain successfully', async () => {
-      const mockResponse = { address: 'EQTest123...', ok: true };
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        if (param === 'operation') return 'resolveDns';
-        if (param === 'domain_name') return 'test.ton';
-        return undefined;
-      });
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+  it('should resolve domain successfully', async () => {
+    const mockResponse = { address: 'EQD1...' };
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('resolveDomain').mockReturnValueOnce('test.ton');
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      const items = [{ json: {} }];
-      const result = await executeDNSOperations.call(mockExecuteFunctions, items);
+    const result = await executeDomainOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'GET',
-        url: 'https://toncenter.com/api/v3/dns/resolve',
-        headers: {
-          'Authorization': 'Bearer test-api-key',
-          'Content-Type': 'application/json',
-        },
-        qs: { domain_name: 'test.ton' },
-        json: true,
-      });
-    });
-
-    it('should handle missing domain name', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        if (param === 'operation') return 'resolveDns';
-        if (param === 'domain_name') return '';
-        return undefined;
-      });
-
-      const items = [{ json: {} }];
-      
-      await expect(executeDNSOperations.call(mockExecuteFunctions, items))
-        .rejects.toThrow('Domain name is required');
+    expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: 'https://tonapi.io/v2/dns/test.ton',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json',
+      },
+      json: true,
     });
   });
 
-  describe('getDnsDomains', () => {
-    it('should get DNS domains successfully', async () => {
-      const mockResponse = { domains: ['test1.ton', 'test2.ton'], ok: true };
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number, defaultValue: any) => {
-        if (param === 'operation') return 'getDnsDomains';
-        if (param === 'limit') return defaultValue || 50;
-        if (param === 'offset') return defaultValue || 10;
-        return undefined;
-      });
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+  it('should get domain bids successfully', async () => {
+    const mockResponse = { bids: [] };
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getDomainBids').mockReturnValueOnce('test.ton');
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      const items = [{ json: {} }];
-      const result = await executeDNSOperations.call(mockExecuteFunctions, items);
+    const result = await executeDomainOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'GET',
-        url: 'https://toncenter.com/api/v3/dns/domains',
-        headers: {
-          'Authorization': 'Bearer test-api-key',
-          'Content-Type': 'application/json',
-        },
-        qs: { limit: 50, offset: 10 },
-        json: true,
-      });
+    expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+  });
+
+  it('should get domains auctions successfully', async () => {
+    const mockResponse = { auctions: [] };
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getDomainsAuctions').mockReturnValueOnce('ton');
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+    const result = await executeDomainOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+    expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+  });
+
+  it('should get domain info successfully', async () => {
+    const mockResponse = { domain: 'test.ton', registration_date: 1234567890 };
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getDomainInfo').mockReturnValueOnce('test.ton');
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+    const result = await executeDomainOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+    expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+  });
+
+  it('should bulk resolve domains successfully', async () => {
+    const mockResponse = { resolved: [] };
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('bulkResolveDomains').mockReturnValueOnce('test1.ton, test2.ton');
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+    const result = await executeDomainOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+    expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'https://tonapi.io/v2/dns/resolve',
+      headers: {
+        'Authorization': 'Bearer test-token',
+        'Content-Type': 'application/json',
+      },
+      body: {
+        domains: ['test1.ton', 'test2.ton'],
+      },
+      json: true,
     });
   });
 
-  describe('getDnsAuctions', () => {
-    it('should get DNS auctions successfully', async () => {
-      const mockResponse = { auctions: [{ domain: 'test.ton', price: '1000000000' }], ok: true };
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number, defaultValue: any) => {
-        if (param === 'operation') return 'getDnsAuctions';
-        if (param === 'limit') return defaultValue || 25;
-        if (param === 'offset') return defaultValue || 0;
-        return undefined;
-      });
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+  it('should handle errors with continueOnFail', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('resolveDomain').mockReturnValueOnce('test.ton');
+    mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
+    mockExecuteFunctions.continueOnFail.mockReturnValue(true);
 
-      const items = [{ json: {} }];
-      const result = await executeDNSOperations.call(mockExecuteFunctions, items);
+    const result = await executeDomainOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-    });
-  });
-
-  describe('getDnsDomain', () => {
-    it('should get specific domain information successfully', async () => {
-      const mockResponse = { domain: 'test.ton', owner: 'EQTest123...', ok: true };
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        if (param === 'operation') return 'getDnsDomain';
-        if (param === 'domain') return 'test.ton';
-        return undefined;
-      });
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const items = [{ json: {} }];
-      const result = await executeDNSOperations.call(mockExecuteFunctions, items);
-
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'GET',
-        url: 'https://toncenter.com/api/v3/dns/domain/test.ton',
-        headers: {
-          'Authorization': 'Bearer test-api-key',
-          'Content-Type': 'application/json',
-        },
-        json: true,
-      });
-    });
-  });
-
-  describe('createDnsBid', () => {
-    it('should create DNS bid successfully', async () => {
-      const mockResponse = { success: true, transaction_hash: '0xabc123' };
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        if (param === 'operation') return 'createDnsBid';
-        if (param === 'domain') return 'test.ton';
-        if (param === 'amount') return '1000000000';
-        if (param === 'bidder_address') return 'EQTest123456789012345678901234567890123456789012345678';
-        return undefined;
-      });
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const items = [{ json: {} }];
-      const result = await executeDNSOperations.call(mockExecuteFunctions, items);
-
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'POST',
-        url: 'https://toncenter.com/api/v3/dns/bids',
-        headers: {
-          'Authorization': 'Bearer test-api-key',
-          'Content-Type': 'application/json',
-        },
-        body: {
-          domain: 'test.ton',
-          amount: '1000000000',
-          bidder_address: 'EQTest123456789012345678901234567890123456789012345678',
-        },
-        json: true,
-      });
-    });
-
-    it('should handle invalid TON address', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        if (param === 'operation') return 'createDnsBid';
-        if (param === 'domain') return 'test.ton';
-        if (param === 'amount') return '1000000000';
-        if (param === 'bidder_address') return 'invalid-address';
-        return undefined;
-      });
-
-      const items = [{ json: {} }];
-      
-      await expect(executeDNSOperations.call(mockExecuteFunctions, items))
-        .rejects.toThrow('Invalid TON address format');
-    });
-  });
-
-  describe('error handling', () => {
-    it('should handle API errors with continueOnFail', async () => {
-      mockExecuteFunctions.getNodeParameter.mockReturnValue('resolveDns');
-      mockExecuteFunctions.continueOnFail.mockReturnValue(true);
-      mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
-
-      const items = [{ json: {} }];
-      const result = await executeDNSOperations.call(mockExecuteFunctions, items);
-
-      expect(result).toEqual([{ json: { error: 'API Error' }, pairedItem: { item: 0 } }]);
-    });
+    expect(result).toEqual([{ json: { error: 'API Error' }, pairedItem: { item: 0 } }]);
   });
 });
 
 describe('Staking Resource', () => {
+	let mockExecuteFunctions: any;
+
+	beforeEach(() => {
+		mockExecuteFunctions = {
+			getNodeParameter: jest.fn(),
+			getCredentials: jest.fn().mockResolvedValue({
+				bearer_token: 'test-token',
+				baseUrl: 'https://tonapi.io/v2',
+			}),
+			getInputData: jest.fn().mockReturnValue([{ json: {} }]),
+			getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
+			continueOnFail: jest.fn().mockReturnValue(false),
+			helpers: {
+				httpRequest: jest.fn(),
+			},
+		};
+	});
+
+	describe('getStakingPools', () => {
+		it('should get staking pools successfully', async () => {
+			const mockResponse = { pools: [{ id: 'pool1', name: 'Test Pool' }] };
+			mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
+				switch (paramName) {
+					case 'operation': return 'getStakingPools';
+					case 'available_for': return 'test';
+					case 'include_unverified': return true;
+					default: return undefined;
+				}
+			});
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+			const result = await executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+			expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+		});
+
+		it('should handle errors in getStakingPools', async () => {
+			mockExecuteFunctions.getNodeParameter.mockReturnValue('getStakingPools');
+			mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
+			mockExecuteFunctions.continueOnFail.mockReturnValue(true);
+
+			const result = await executeStakingPools.call(mockExecuteFunctions, [{ json: {} }]);
+
+			expect(result[0].json.error).toBe('API Error');
+		});
+	});
+
+	describe('getStakingPool', () => {
+		it('should get staking pool successfully', async () => {
+			const mockResponse = { id: 'pool1', name: 'Test Pool' };
+			mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
+				switch (paramName) {
+					case 'operation': return 'getStakingPool';
+					case 'pool_id': return 'pool1';
+					default: return undefined;
+				}
+			});
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+			const result = await executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+			expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+		});
+	});
+
+	describe('getPoolHistory', () => {
+		it('should get pool history successfully', async () => {
+			const mockResponse = { history: [{ timestamp: 1234567890, amount: '1000' }] };
+			mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
+				switch (paramName) {
+					case 'operation': return 'getPoolHistory';
+					case 'pool_id': return 'pool1';
+					case 'limit': return 50;
+					case 'offset': return 10;
+					default: return undefined;
+				}
+			});
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+			const result = await executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+			expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+		});
+	});
+
+	describe('getAccountStaking', () => {
+		it('should get account staking successfully', async () => {
+			const mockResponse = { account: 'test-account', staking_info: {} };
+			mockExecuteFunctions.getNodeParameter.mockImplementation((paramName: string) => {
+				switch (paramName) {
+					case 'operation': return 'getAccountStaking';
+					case 'account_id': return 'test-account';
+					default: return undefined;
+				}
+			});
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+			const result = await executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+			expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+		});
+	});
+});
+
+describe('Blockchain Resource', () => {
   let mockExecuteFunctions: any;
 
   beforeEach(() => {
     mockExecuteFunctions = {
       getNodeParameter: jest.fn(),
       getCredentials: jest.fn().mockResolvedValue({
-        apiKey: 'test-api-key',
-        baseUrl: 'https://toncenter.com/api/v3',
+        bearerToken: 'test-token',
+        baseUrl: 'https://tonapi.io/v2'
       }),
       getInputData: jest.fn().mockReturnValue([{ json: {} }]),
       getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
       continueOnFail: jest.fn().mockReturnValue(false),
       helpers: {
         httpRequest: jest.fn(),
-        requestWithAuthentication: jest.fn(),
+        requestWithAuthentication: jest.fn()
       },
     };
   });
 
-  describe('getValidators', () => {
-    it('should get validators successfully', async () => {
-      const mockResponse = {
-        validators: [
-          { address: 'validator1', stake: '1000000' },
-          { address: 'validator2', stake: '2000000' },
-        ],
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getValidators';
-          case 'limit': return 50;
-          case 'offset': return 0;
-          default: return undefined;
-        }
-      });
-
+  describe('getMasterchainInfo', () => {
+    it('should get masterchain info successfully', async () => {
+      const mockResponse = { workchain: -1, shard: '-9223372036854775808', seqno: 12345 };
+      mockExecuteFunctions.getNodeParameter.mockReturnValue('getMasterchainInfo');
       mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      const result = await executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }]);
+      const result = await executeBlockchainOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      expect(result).toEqual([
-        { json: mockResponse, pairedItem: { item: 0 } },
-      ]);
       expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
         method: 'GET',
-        url: 'https://toncenter.com/api/v3/validators',
+        url: 'https://tonapi.io/v2/blockchain/masterchain-head',
         headers: {
-          'Authorization': 'Bearer test-api-key',
+          'Authorization': 'Bearer test-token',
           'Content-Type': 'application/json',
-        },
-        qs: { limit: 50, offset: 0 },
-        json: true,
-      });
-    });
-  });
-
-  describe('getNominators', () => {
-    it('should get nominators successfully', async () => {
-      const mockResponse = {
-        nominators: [
-          { address: 'nominator1', pool: 'pool1' },
-          { address: 'nominator2', pool: 'pool2' },
-        ],
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getNominators';
-          case 'limit': return 25;
-          case 'offset': return 10;
-          default: return undefined;
-        }
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toEqual([
-        { json: mockResponse, pairedItem: { item: 0 } },
-      ]);
-    });
-  });
-
-  describe('getStakes', () => {
-    it('should get stakes successfully', async () => {
-      const mockResponse = {
-        stakes: [
-          { validator: 'validator1', amount: '1000000' },
-          { validator: 'validator2', amount: '500000' },
-        ],
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getStakes';
-          case 'nominatorAddress': return 'EQAbCdEfGhIjKlMnOpQrStUvWxYz1234567890AbCdEfGhIjKlMn';
-          default: return undefined;
-        }
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toEqual([
-        { json: mockResponse, pairedItem: { item: 0 } },
-      ]);
-    });
-
-    it('should throw error for invalid address', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getStakes';
-          case 'nominatorAddress': return 'invalid-address';
-          default: return undefined;
-        }
-      });
-
-      await expect(
-        executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }])
-      ).rejects.toThrow('Invalid TON address format: invalid-address');
-    });
-  });
-
-  describe('getStakingPools', () => {
-    it('should get staking pools successfully', async () => {
-      const mockResponse = {
-        pools: [
-          { id: 'pool1', validators: 5, totalStake: '10000000' },
-          { id: 'pool2', validators: 3, totalStake: '5000000' },
-        ],
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getStakingPools';
-          case 'limit': return 20;
-          case 'offset': return 5;
-          default: return undefined;
-        }
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toEqual([
-        { json: mockResponse, pairedItem: { item: 0 } },
-      ]);
-    });
-  });
-
-  describe('delegateStake', () => {
-    it('should delegate stake successfully', async () => {
-      const mockResponse = {
-        success: true,
-        transactionId: 'tx123',
-        amount: '1000000000',
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'delegateStake';
-          case 'validatorAddress': return 'EQValidator1234567890AbCdEfGhIjKlMnOpQrStUvWxYz123';
-          case 'amount': return '1000000000';
-          case 'nominatorAddress': return 'EQNominator1234567890AbCdEfGhIjKlMnOpQrStUvWxYz12';
-          default: return undefined;
-        }
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toEqual([
-        { json: mockResponse, pairedItem: { item: 0 } },
-      ]);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'POST',
-        url: 'https://toncenter.com/api/v3/staking/delegate',
-        headers: {
-          'Authorization': 'Bearer test-api-key',
-          'Content-Type': 'application/json',
-        },
-        body: {
-          validator_address: 'EQValidator1234567890AbCdEfGhIjKlMnOpQrStUvWxYz123',
-          amount: '1000000000',
-          nominator_address: 'EQNominator1234567890AbCdEfGhIjKlMnOpQrStUvWxYz12',
         },
         json: true,
       });
+      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
     });
 
-    it('should throw error for invalid validator address', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'delegateStake';
-          case 'validatorAddress': return 'invalid-validator';
-          case 'amount': return '1000000000';
-          case 'nominatorAddress': return 'EQNominator1234567890AbCdEfGhIjKlMnOpQrStUvWxYz12';
-          default: return undefined;
-        }
-      });
-
-      await expect(
-        executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }])
-      ).rejects.toThrow('Invalid validator address format: invalid-validator');
-    });
-  });
-
-  describe('error handling', () => {
-    it('should handle API errors', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getValidators';
-          case 'limit': return 50;
-          case 'offset': return 0;
-          default: return undefined;
-        }
-      });
-
+    it('should handle errors in getMasterchainInfo', async () => {
+      mockExecuteFunctions.getNodeParameter.mockReturnValue('getMasterchainInfo');
       mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
-
-      await expect(
-        executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }])
-      ).rejects.toThrow('API Error');
-    });
-
-    it('should continue on fail when configured', async () => {
       mockExecuteFunctions.continueOnFail.mockReturnValue(true);
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getValidators';
-          case 'limit': return 50;
-          case 'offset': return 0;
-          default: return undefined;
-        }
+
+      const result = await executeBlockchainOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+      expect(result).toEqual([{ json: { error: 'API Error' }, pairedItem: { item: 0 } }]);
+    });
+  });
+
+  describe('getBlockchainBlock', () => {
+    it('should get blockchain block successfully', async () => {
+      const mockResponse = { workchain: 0, shard: '8000000000000000', seqno: 67890 };
+      mockExecuteFunctions.getNodeParameter
+        .mockReturnValueOnce('getBlockchainBlock')
+        .mockReturnValueOnce('test-block-id');
+      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+      const result = await executeBlockchainOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+        method: 'GET',
+        url: 'https://tonapi.io/v2/blockchain/blocks/test-block-id',
+        headers: {
+          'Authorization': 'Bearer test-token',
+          'Content-Type': 'application/json',
+        },
+        json: true,
       });
+      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+    });
 
-      mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
+    it('should handle errors in getBlockchainBlock', async () => {
+      mockExecuteFunctions.getNodeParameter
+        .mockReturnValueOnce('getBlockchainBlock')
+        .mockReturnValueOnce('test-block-id');
+      mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('Block not found'));
+      mockExecuteFunctions.continueOnFail.mockReturnValue(true);
 
-      const result = await executeStakingOperations.call(mockExecuteFunctions, [{ json: {} }]);
+      const result = await executeBlockchainOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      expect(result).toEqual([
-        { json: { error: 'API Error' }, pairedItem: { item: 0 } },
-      ]);
+      expect(result).toEqual([{ json: { error: 'Block not found' }, pairedItem: { item: 0 } }]);
+    });
+  });
+
+  describe('getBlockTransactions', () => {
+    it('should get block transactions successfully', async () => {
+      const mockResponse = { transactions: [{ hash: 'tx1' }, { hash: 'tx2' }] };
+      mockExecuteFunctions.getNodeParameter
+        .mockReturnValueOnce('getBlockTransactions')
+        .mockReturnValueOnce('test-block-id');
+      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+      const result = await executeBlockchainOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+        method: 'GET',
+        url: 'https://tonapi.io/v2/blockchain/blocks/test-block-id/transactions',
+        headers: {
+          'Authorization': 'Bearer test-token',
+          'Content-Type': 'application/json',
+        },
+        json: true,
+      });
+      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+    });
+  });
+
+  describe('getValidators', () => {
+    it('should get validators successfully', async () => {
+      const mockResponse = { validators: [{ address: 'val1' }, { address: 'val2' }] };
+      mockExecuteFunctions.getNodeParameter.mockReturnValue('getValidators');
+      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+      const result = await executeBlockchainOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+        method: 'GET',
+        url: 'https://tonapi.io/v2/blockchain/validators',
+        headers: {
+          'Authorization': 'Bearer test-token',
+          'Content-Type': 'application/json',
+        },
+        json: true,
+      });
+      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+    });
+  });
+
+  describe('getBlockchainConfig', () => {
+    it('should get blockchain config successfully', async () => {
+      const mockResponse = { config: { parameter1: 'value1', parameter2: 'value2' } };
+      mockExecuteFunctions.getNodeParameter.mockReturnValue('getBlockchainConfig');
+      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+      const result = await executeBlockchainOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+        method: 'GET',
+        url: 'https://tonapi.io/v2/blockchain/config',
+        headers: {
+          'Authorization': 'Bearer test-token',
+          'Content-Type': 'application/json',
+        },
+        json: true,
+      });
+      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+    });
+  });
+
+  describe('getStatus', () => {
+    it('should get blockchain status successfully', async () => {
+      const mockResponse = { ready: true, last_known_masterchain_seqno: 12345 };
+      mockExecuteFunctions.getNodeParameter.mockReturnValue('getStatus');
+      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+      const result = await executeBlockchainOperations.call(mockExecuteFunctions, [{ json: {} }]);
+
+      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+        method: 'GET',
+        url: 'https://tonapi.io/v2/blockchain/status',
+        headers: {
+          'Authorization': 'Bearer test-token',
+          'Content-Type': 'application/json',
+        },
+        json: true,
+      });
+      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
     });
   });
 });
